@@ -32,22 +32,26 @@ abstract contract ERC404 is IERC404 {
     /// @inheritdoc IERC404
     mapping(address owner => mapping(address operator => bool isApproved)) public isApprovedForAll;
 
-    // ---------------------- Internal state ---------------------- //
-    /// @dev Owner of id in native representation.
+    // ---------------------- Internals ---------------------- //
+    /// @dev Representation of a single unit of the token.
+    uint256 internal immutable _UNIT;
+
+    /// @dev Owner of id in NFT representation.
     mapping(uint256 tokenId => address owner) internal _ownerOf;
 
-    /// @dev Array of owned ids in native representation.
+    /// @dev Array of owned ids in NFT representation.
     mapping(address owner => uint256[] tokenIds) internal _owned;
 
     /// @dev Tracks indices for the _owned mapping.
     mapping(uint256 tokenId => uint256 index) internal _ownedIndex;
 
     // Constructor
-    constructor(string memory name_, string memory symbol_, uint8 decimals_, uint256 totalNativeSupply_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_, uint256 totalNFTSupply_) {
         name = name_;
         symbol = symbol_;
         decimals = decimals_;
-        totalSupply = totalNativeSupply_ * (10 ** decimals);
+        _UNIT = 10 ** decimals_;
+        totalSupply = totalNFTSupply_ * _UNIT;
     }
 
     /// @inheritdoc IERC404
@@ -58,9 +62,6 @@ abstract contract ERC404 is IERC404 {
             revert NotFound();
         }
     }
-
-    /// @inheritdoc IERC404
-    function tokenURI(uint256 id) public view virtual returns (string memory);
 
     /// @inheritdoc IERC404
     function approve(address spender, uint256 amountOrId) public virtual returns (bool) {
@@ -105,10 +106,10 @@ abstract contract ERC404 is IERC404 {
                 revert Unauthorized();
             }
 
-            balanceOf[from] -= _getUnit();
+            balanceOf[from] -= _UNIT;
 
             unchecked {
-                balanceOf[to] += _getUnit();
+                balanceOf[to] += _UNIT;
             }
 
             _ownerOf[amountOrId] = to;
@@ -127,7 +128,7 @@ abstract contract ERC404 is IERC404 {
             _ownedIndex[amountOrId] = _owned[to].length - 1;
 
             emit Transfer(from, to, amountOrId);
-            emit ERC20Transfer(from, to, _getUnit());
+            emit ERC20Transfer(from, to, _UNIT);
         } else {
             uint256 allowed = allowance[from][msg.sender];
 
@@ -170,10 +171,13 @@ abstract contract ERC404 is IERC404 {
         }
     }
 
+    /// @inheritdoc IERC404
+    function tokenURI(uint256 id) public view virtual returns (string memory);
+
     // ---------------------- Internal functions ---------------------- //
     /// @notice Internal function for fractional transfers.
     function _transfer(address from, address to, uint256 amount) internal returns (bool) {
-        uint256 unit = _getUnit();
+        uint256 unit = _UNIT;
         uint256 balanceBeforeSender = balanceOf[from];
         uint256 balanceBeforeReceiver = balanceOf[to];
 
@@ -183,7 +187,7 @@ abstract contract ERC404 is IERC404 {
             balanceOf[to] += amount;
         }
 
-        // Skip burn for certain addresses to save gas.
+        // Skip burn for certain addresses (i.e. trading pairs) to save gas.
         if (!_isExempted(from)) {
             uint256 tokensToBurn = (balanceBeforeSender / unit) - (balanceOf[from] / unit);
             for (uint256 i = 0; i < tokensToBurn; i++) {
@@ -191,7 +195,7 @@ abstract contract ERC404 is IERC404 {
             }
         }
 
-        // Skip minting for certain addresses to save gas.
+        // Skip minting for certain addresses (i.e. trading pairs) to save gas.
         if (!_isExempted(to)) {
             uint256 tokensToMint = (balanceOf[to] / unit) - (balanceBeforeReceiver / unit);
             for (uint256 i = 0; i < tokensToMint; i++) {
@@ -201,14 +205,6 @@ abstract contract ERC404 is IERC404 {
 
         emit ERC20Transfer(from, to, amount);
         return true;
-    }
-
-    /// @notice Internal function to check if an address is exempted from NFT mint/burn on transfer.
-    function _isExempted(address target) internal view virtual returns (bool);
-
-    // Internal utility logic.
-    function _getUnit() internal view returns (uint256) {
-        return 10 ** decimals;
     }
 
     function _mint(address to) internal virtual {
@@ -246,4 +242,7 @@ abstract contract ERC404 is IERC404 {
 
         emit Transfer(from, address(0), id);
     }
+
+    /// @notice Internal function to check if an address is exempted from NFT mint/burn on transfer.
+    function _isExempted(address target) internal view virtual returns (bool);
 }
