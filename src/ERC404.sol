@@ -1,10 +1,13 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.23;
 
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { ERC165, IERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import { IERC404 } from "./IERC404.sol";
 
-abstract contract ERC404 is IERC404 {
+abstract contract ERC404 is IERC404, ERC165 {
     /// @inheritdoc IERC404
     string public name;
 
@@ -56,11 +59,7 @@ abstract contract ERC404 is IERC404 {
 
     /// @inheritdoc IERC404
     function ownerOf(uint256 id) public view virtual returns (address owner) {
-        owner = _ownerOf[id];
-
-        if (owner == address(0)) {
-            revert NotFound();
-        }
+        return _requireOwned(id);
     }
 
     /// @inheritdoc IERC404
@@ -171,25 +170,29 @@ abstract contract ERC404 is IERC404 {
         }
     }
 
+    /// @inheritdoc IERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IERC20).interfaceId || interfaceId == type(IERC721).interfaceId
+            || super.supportsInterface(interfaceId);
+    }
+
     /// @inheritdoc IERC404
     function tokenURI(uint256 id) public view virtual returns (string memory);
 
     // ---------------------- Internal functions ---------------------- //
     /// @notice Internal function for fractional transfers.
     function _transfer(address from, address to, uint256 amount) internal returns (bool) {
-        uint256 unit = _UNIT;
         uint256 balanceBeforeSender = balanceOf[from];
         uint256 balanceBeforeReceiver = balanceOf[to];
 
         balanceOf[from] -= amount;
-
         unchecked {
             balanceOf[to] += amount;
         }
 
         // Skip burn for certain addresses (i.e. trading pairs) to save gas.
         if (!_isExempted(from)) {
-            uint256 tokensToBurn = (balanceBeforeSender / unit) - (balanceOf[from] / unit);
+            uint256 tokensToBurn = (balanceBeforeSender / _UNIT) - (balanceOf[from] / _UNIT);
             for (uint256 i = 0; i < tokensToBurn; i++) {
                 _burn(from);
             }
@@ -197,7 +200,7 @@ abstract contract ERC404 is IERC404 {
 
         // Skip minting for certain addresses (i.e. trading pairs) to save gas.
         if (!_isExempted(to)) {
-            uint256 tokensToMint = (balanceOf[to] / unit) - (balanceBeforeReceiver / unit);
+            uint256 tokensToMint = (balanceOf[to] / _UNIT) - (balanceBeforeReceiver / _UNIT);
             for (uint256 i = 0; i < tokensToMint; i++) {
                 _mint(to);
             }
@@ -241,6 +244,14 @@ abstract contract ERC404 is IERC404 {
         delete getApproved[id];
 
         emit Transfer(from, address(0), id);
+    }
+
+    function _requireOwned(uint256 id) internal view returns (address owner) {
+        owner = _ownerOf[id];
+
+        if (_ownerOf[id] == address(0)) {
+            revert NotFound();
+        }
     }
 
     /// @notice Internal function to check if an address is exempted from NFT mint/burn on transfer.
