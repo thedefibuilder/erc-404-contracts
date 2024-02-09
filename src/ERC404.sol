@@ -3,52 +3,40 @@ pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC404 } from "./IERC404.sol";
 
-abstract contract ERC404 is Ownable {
-    // Events
-    event ERC20Transfer(address indexed from, address indexed to, uint256 amount);
-    event Approval(address indexed owner, address indexed spender, uint256 amount);
-    event Transfer(address indexed from, address indexed to, uint256 indexed id);
-    event ERC721Approval(address indexed owner, address indexed spender, uint256 indexed id);
-    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-
-    // Errors
-    error NotFound();
-    error AlreadyExists();
-    error InvalidRecipient();
-    error InvalidSender();
-    error UnsafeRecipient();
-    error Unauthorized();
-
-    // Metadata
-    /// @dev Token name
+abstract contract ERC404 is IERC404, Ownable {
+    /// @inheritdoc IERC404
     string public name;
 
-    /// @dev Token symbol
+    /// @inheritdoc IERC404
     string public symbol;
 
-    /// @dev Decimals for fractional representation
+    /// @inheritdoc IERC404
     uint8 public immutable decimals;
 
-    /// @dev Total supply in fractionalized representation
+    /// @inheritdoc IERC404
     uint256 public immutable totalSupply;
 
-    /// @dev Current mint counter, monotonically increasing to ensure accurate ownership
+    /// @inheritdoc IERC404
     uint256 public minted;
 
-    // Mappings
-    /// @dev Balance of user in fractional representation
+    /// @inheritdoc IERC404
     mapping(address user => uint256 balance) public balanceOf;
 
-    /// @dev Allowance of user in fractional representation
+    /// @inheritdoc IERC404
     mapping(address owner => mapping(address operator => uint256 amount)) public allowance;
 
-    /// @dev Approval in native representaion
+    /// @inheritdoc IERC404
     mapping(uint256 tokenId => address operator) public getApproved;
 
-    /// @dev Approval for all in native representation
+    /// @inheritdoc IERC404
     mapping(address owner => mapping(address operator => bool isApproved)) public isApprovedForAll;
 
+    /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
+    mapping(address user => bool isWhitelisted) public whitelist;
+
+    // ---------------------- Internal state ---------------------- //
     /// @dev Owner of id in native representation
     mapping(uint256 tokenId => address owner) internal _ownerOf;
 
@@ -58,23 +46,20 @@ abstract contract ERC404 is Ownable {
     /// @dev Tracks indices for the _owned mapping
     mapping(uint256 tokenId => uint256 index) internal _ownedIndex;
 
-    /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
-    mapping(address user => bool isWhitelisted) public whitelist;
-
     // Constructor
     constructor(
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _totalNativeSupply,
-        address _owner
+        string memory name_,
+        string memory symbol_,
+        uint8 decimals_,
+        uint256 totalNativeSupply_,
+        address owner_
     )
-        Ownable(_owner)
+        Ownable(owner_)
     {
-        name = _name;
-        symbol = _symbol;
-        decimals = _decimals;
-        totalSupply = _totalNativeSupply * (10 ** decimals);
+        name = name_;
+        symbol = symbol_;
+        decimals = decimals_;
+        totalSupply = totalNativeSupply_ * (10 ** decimals);
     }
 
     /// @notice Initialization function to set pairs / etc
@@ -83,7 +68,7 @@ abstract contract ERC404 is Ownable {
         whitelist[target] = state;
     }
 
-    /// @notice Function to find owner of a given native token
+    /// @inheritdoc IERC404
     function ownerOf(uint256 id) public view virtual returns (address owner) {
         owner = _ownerOf[id];
 
@@ -92,11 +77,11 @@ abstract contract ERC404 is Ownable {
         }
     }
 
-    /// @notice tokenURI must be implemented by child contract
+    /// @inheritdoc IERC404
+    /// @dev tokenURI must be implemented by child contract
     function tokenURI(uint256 id) public view virtual returns (string memory);
 
-    /// @notice Function for token approvals
-    /// @dev This function assumes id / native if amount less than or equal to current max id
+    /// @inheritdoc IERC404
     function approve(address spender, uint256 amountOrId) public virtual returns (bool) {
         if (amountOrId <= minted && amountOrId > 0) {
             address owner = _ownerOf[amountOrId];
@@ -117,15 +102,14 @@ abstract contract ERC404 is Ownable {
         return true;
     }
 
-    /// @notice Function native approvals
+    /// @inheritdoc IERC404
     function setApprovalForAll(address operator, bool approved) public virtual {
         isApprovedForAll[msg.sender][operator] = approved;
 
         emit ApprovalForAll(msg.sender, operator, approved);
     }
 
-    /// @notice Function for mixed transfers
-    /// @dev This function assumes id / native if amount less than or equal to current max id
+    /// @inheritdoc IERC404
     function transferFrom(address from, address to, uint256 amountOrId) public virtual {
         if (amountOrId <= minted) {
             if (from != _ownerOf[amountOrId]) {
@@ -174,12 +158,12 @@ abstract contract ERC404 is Ownable {
         }
     }
 
-    /// @notice Function for fractional transfers
+    /// @inheritdoc IERC404
     function transfer(address to, uint256 amount) public virtual returns (bool) {
         return _transfer(msg.sender, to, amount);
     }
 
-    /// @notice Function for native transfers with contract support
+    /// @inheritdoc IERC404
     function safeTransferFrom(address from, address to, uint256 id) public virtual {
         transferFrom(from, to, id);
 
@@ -192,7 +176,7 @@ abstract contract ERC404 is Ownable {
         }
     }
 
-    /// @notice Function for native transfers with contract support and callback data
+    /// @inheritdoc IERC404
     function safeTransferFrom(address from, address to, uint256 id, bytes calldata data) public virtual {
         transferFrom(from, to, id);
 
@@ -205,6 +189,7 @@ abstract contract ERC404 is Ownable {
         }
     }
 
+    // ---------------------- Internal functions ---------------------- //
     /// @notice Internal function for fractional transfers
     function _transfer(address from, address to, uint256 amount) internal returns (bool) {
         uint256 unit = _getUnit();
@@ -276,10 +261,5 @@ abstract contract ERC404 is Ownable {
         delete getApproved[id];
 
         emit Transfer(from, address(0), id);
-    }
-
-    function _setNameSymbol(string memory _name, string memory _symbol) internal {
-        name = _name;
-        symbol = _symbol;
     }
 }
