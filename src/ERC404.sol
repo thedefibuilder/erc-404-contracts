@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.23;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { IERC404 } from "./IERC404.sol";
 
-abstract contract ERC404 is IERC404, Ownable {
+abstract contract ERC404 is IERC404 {
     /// @inheritdoc IERC404
     string public name;
 
@@ -33,39 +32,22 @@ abstract contract ERC404 is IERC404, Ownable {
     /// @inheritdoc IERC404
     mapping(address owner => mapping(address operator => bool isApproved)) public isApprovedForAll;
 
-    /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
-    mapping(address user => bool isWhitelisted) public whitelist;
-
     // ---------------------- Internal state ---------------------- //
-    /// @dev Owner of id in native representation
+    /// @dev Owner of id in native representation.
     mapping(uint256 tokenId => address owner) internal _ownerOf;
 
-    /// @dev Array of owned ids in native representation
+    /// @dev Array of owned ids in native representation.
     mapping(address owner => uint256[] tokenIds) internal _owned;
 
-    /// @dev Tracks indices for the _owned mapping
+    /// @dev Tracks indices for the _owned mapping.
     mapping(uint256 tokenId => uint256 index) internal _ownedIndex;
 
     // Constructor
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_,
-        uint256 totalNativeSupply_,
-        address owner_
-    )
-        Ownable(owner_)
-    {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_, uint256 totalNativeSupply_) {
         name = name_;
         symbol = symbol_;
         decimals = decimals_;
         totalSupply = totalNativeSupply_ * (10 ** decimals);
-    }
-
-    /// @notice Initialization function to set pairs / etc
-    ///         saving gas by avoiding mint / burn on unnecessary targets
-    function setWhitelist(address target, bool state) public onlyOwner {
-        whitelist[target] = state;
     }
 
     /// @inheritdoc IERC404
@@ -78,7 +60,6 @@ abstract contract ERC404 is IERC404, Ownable {
     }
 
     /// @inheritdoc IERC404
-    /// @dev tokenURI must be implemented by child contract
     function tokenURI(uint256 id) public view virtual returns (string memory);
 
     /// @inheritdoc IERC404
@@ -190,7 +171,7 @@ abstract contract ERC404 is IERC404, Ownable {
     }
 
     // ---------------------- Internal functions ---------------------- //
-    /// @notice Internal function for fractional transfers
+    /// @notice Internal function for fractional transfers.
     function _transfer(address from, address to, uint256 amount) internal returns (bool) {
         uint256 unit = _getUnit();
         uint256 balanceBeforeSender = balanceOf[from];
@@ -202,16 +183,16 @@ abstract contract ERC404 is IERC404, Ownable {
             balanceOf[to] += amount;
         }
 
-        // Skip burn for certain addresses to save gas
-        if (!whitelist[from]) {
+        // Skip burn for certain addresses to save gas.
+        if (!_isExempted(from)) {
             uint256 tokensToBurn = (balanceBeforeSender / unit) - (balanceOf[from] / unit);
             for (uint256 i = 0; i < tokensToBurn; i++) {
                 _burn(from);
             }
         }
 
-        // Skip minting for certain addresses to save gas
-        if (!whitelist[to]) {
+        // Skip minting for certain addresses to save gas.
+        if (!_isExempted(to)) {
             uint256 tokensToMint = (balanceOf[to] / unit) - (balanceBeforeReceiver / unit);
             for (uint256 i = 0; i < tokensToMint; i++) {
                 _mint(to);
@@ -222,7 +203,10 @@ abstract contract ERC404 is IERC404, Ownable {
         return true;
     }
 
-    // Internal utility logic
+    /// @notice Internal function to check if an address is exempted from NFT mint/burn on transfer.
+    function _isExempted(address target) internal view virtual returns (bool);
+
+    // Internal utility logic.
     function _getUnit() internal view returns (uint256) {
         return 10 ** decimals;
     }
