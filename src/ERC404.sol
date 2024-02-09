@@ -38,28 +38,28 @@ abstract contract ERC404 is Ownable {
 
     // Mappings
     /// @dev Balance of user in fractional representation
-    mapping(address => uint256) public balanceOf;
+    mapping(address user => uint256 balance) public balanceOf;
 
     /// @dev Allowance of user in fractional representation
-    mapping(address => mapping(address => uint256)) public allowance;
+    mapping(address owner => mapping(address operator => uint256 amount)) public allowance;
 
     /// @dev Approval in native representaion
-    mapping(uint256 => address) public getApproved;
+    mapping(uint256 tokenId => address operator) public getApproved;
 
     /// @dev Approval for all in native representation
-    mapping(address => mapping(address => bool)) public isApprovedForAll;
+    mapping(address owner => mapping(address operator => bool isApproved)) public isApprovedForAll;
 
     /// @dev Owner of id in native representation
-    mapping(uint256 => address) internal _ownerOf;
+    mapping(uint256 tokenId => address owner) internal _ownerOf;
 
     /// @dev Array of owned ids in native representation
-    mapping(address => uint256[]) internal _owned;
+    mapping(address owner => uint256[] tokenIds) internal _owned;
 
     /// @dev Tracks indices for the _owned mapping
-    mapping(uint256 => uint256) internal _ownedIndex;
+    mapping(uint256 tokenId => uint256 index) internal _ownedIndex;
 
     /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
-    mapping(address => bool) public whitelist;
+    mapping(address user => bool isWhitelisted) public whitelist;
 
     // Constructor
     constructor(
