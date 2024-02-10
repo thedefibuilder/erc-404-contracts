@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
 import { ERC2981 } from "@openzeppelin/contracts/token/common/ERC2981.sol";
