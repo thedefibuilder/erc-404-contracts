@@ -29,12 +29,17 @@ contract Factory is IFactory, Ownable {
         ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, totalNFTSupply, msg.sender);
         _deploymentsOf[msg.sender].push(address(erc404));
 
-        payable(vault).transfer(msg.value);
+        emit ERC404Deployed(msg.sender, address(erc404));
+        if (msg.value > 0) {
+            payable(vault).transfer(msg.value);
+        }
 
         return address(erc404);
     }
 
     function setDeploymentFee(uint256 newDeploymentFee) external onlyOwner {
+        emit DeploymentFeeChanged(deploymentFee, newDeploymentFee);
+
         deploymentFee = newDeploymentFee;
     }
 

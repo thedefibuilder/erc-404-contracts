@@ -3,9 +3,12 @@ pragma solidity >=0.8.23 <0.9.0;
 
 import { BaseScript } from "./Base.s.sol";
 
-/// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
+import { Factory } from "src/factory/Factory.sol";
+
 contract Deploy is BaseScript {
+    Factory public factory;
+
     function run() public broadcast {
-        // deploy here
+        factory = new Factory(broadcaster, 0.01e18, broadcaster);
     }
 }

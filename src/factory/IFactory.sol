@@ -4,6 +4,9 @@ pragma solidity >=0.8.23;
 interface IFactory {
     error InsufficientDeploymentFee();
 
+    event DeploymentFeeChanged(uint256 oldDeploymentFee, uint256 newDeploymentFee);
+    event ERC404Deployed(address indexed deployer, address indexed erc404);
+
     function deployERC404(
         string memory name,
         string memory symbol,
