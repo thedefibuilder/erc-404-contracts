@@ -9,12 +9,19 @@ contract BaseTest is PRBTest, StdCheats {
         address admin;
         address stranger;
         address vault;
+        address deployer;
     }
 
+    bytes4 public constant ERC4906_INTERFACE_ID = bytes4(0x49064906);
     Users public users;
 
     function setUp() public virtual {
-        users = Users({ admin: createUser("admin"), stranger: createUser("stranger"), vault: createUser("vault") });
+        users = Users({
+            admin: createUser("admin"),
+            stranger: createUser("stranger"),
+            vault: createUser("vault"),
+            deployer: createUser("deployer")
+        });
     }
 
     function createUser(string memory name) public returns (address account) {

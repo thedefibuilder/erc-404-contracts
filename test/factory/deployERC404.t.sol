@@ -3,6 +3,7 @@ pragma solidity >=0.8.23;
 
 import { FactoryTest } from "test/factory/Factory.t.sol";
 import { IFactory } from "src/factory/IFactory.sol";
+import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 
 contract Factory_deployERC404 is FactoryTest {
     event ERC404Deployed(address indexed deployer, address indexed erc404);
@@ -26,5 +27,9 @@ contract Factory_deployERC404 is FactoryTest {
         assertEq(factory.deploymentsOf(users.stranger).length, 1);
         assertEq(factory.deploymentsOf(users.stranger)[0], erc404);
         assertEq(address(factory.vault()).balance, vaultBalanceBefore + initialDeploymentFee);
+
+        // Assert that ERC404ManagedURI was deployed
+        address otherERC404 = address(new ERC404ManagedURI("name", "symbol", 1, users.stranger));
+        assertEq(erc404.codehash, otherERC404.codehash);
     }
 }
