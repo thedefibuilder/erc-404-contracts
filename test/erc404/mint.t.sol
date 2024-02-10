@@ -11,7 +11,7 @@ contract ERC404Test_mint is ERC404Test {
         super.setUp();
 
         vm.startPrank(users.deployer);
-        erc404.mint(users.deployer, uint128((TOTAL_NFT_SUPPLY * 10 ** 18) / 2));
+        erc404.mint(users.deployer, 500e18);
     }
 
     function test_RevertsIf_NotAuthorized() public {

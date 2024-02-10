@@ -119,7 +119,7 @@ abstract contract ERC404 is IERC404, ERC165 {
         } else {
             uint256 allowed = allowance[from][msg.sender];
 
-            if (allowed != type(uint256).max) {
+            if (allowed != type(uint256).max && msg.sender != from) {
                 allowance[from][msg.sender] = allowed - amountOrId;
             }
 
