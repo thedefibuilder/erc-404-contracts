@@ -59,7 +59,7 @@ abstract contract ERC404 is IERC404, ERC165 {
 
     /// @inheritdoc IERC404
     function ownerOf(uint256 id) public view virtual returns (address owner) {
-        return _requireOwned(id);
+        return _ownerOf[id];
     }
 
     /// @inheritdoc IERC404
