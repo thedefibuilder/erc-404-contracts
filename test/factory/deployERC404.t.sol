@@ -6,8 +6,6 @@ import { IFactory } from "src/factory/IFactory.sol";
 import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 
 contract Factory_deployERC404 is FactoryTest {
-    event ERC404Deployed(address indexed deployer, address indexed erc404);
-
     function testFuzz_RevertsWhen_DeploymentFeeNotEqual(uint256 deploymentFee) public {
         vm.assume(deploymentFee != factory.deploymentFee());
 
@@ -20,7 +18,7 @@ contract Factory_deployERC404 is FactoryTest {
         uint256 vaultBalanceBefore = address(factory.vault()).balance;
 
         vm.expectEmit(true, false, false, false);
-        emit ERC404Deployed(users.stranger, address(0));
+        emit IFactory.ERC404Deployed(users.stranger, address(0));
 
         address erc404 = factory.deployERC404{ value: initialDeploymentFee }("name", "symbol", 1);
 

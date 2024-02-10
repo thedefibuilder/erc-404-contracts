@@ -4,9 +4,9 @@ pragma solidity >=0.8.23;
 import { IERC20 } from "@openzeppelin/contracts/interfaces/IERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/interfaces/IERC721.sol";
 import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC165.sol";
-import { ERC404ManagedURITest } from "test/extensions/erc404-managed-uri/ERC404ManagedURI.t.sol";
+import { ERC404Test } from "test/erc404/ERC404.t.sol";
 
-contract ERC404ManagedURITest_constructor is ERC404ManagedURITest {
+contract ERC404Test_constructor is ERC404Test {
     function test_constructor() public {
         assertEq(erc404.name(), NAME);
         assertEq(erc404.symbol(), SYMBOL);
