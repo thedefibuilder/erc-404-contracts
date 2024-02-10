@@ -48,7 +48,6 @@ abstract contract ERC404 is IERC404, ERC165 {
     /// @dev Tracks indices for the _owned mapping.
     mapping(uint256 tokenId => uint256 index) internal _ownedIndex;
 
-    // Constructor
     constructor(string memory name_, string memory symbol_, uint8 decimals_, uint256 totalNFTSupply_) {
         name = name_;
         symbol = symbol_;
@@ -114,16 +113,11 @@ abstract contract ERC404 is IERC404, ERC165 {
             _ownerOf[amountOrId] = to;
             delete getApproved[amountOrId];
 
-            // update _owned for sender
             uint256 updatedId = _owned[from][_owned[from].length - 1];
             _owned[from][_ownedIndex[amountOrId]] = updatedId;
-            // pop
             _owned[from].pop();
-            // update index for the moved id
             _ownedIndex[updatedId] = _ownedIndex[amountOrId];
-            // push token to to owned
             _owned[to].push(amountOrId);
-            // update index for to owned
             _ownedIndex[amountOrId] = _owned[to].length - 1;
 
             emit Transfer(from, to, amountOrId);
