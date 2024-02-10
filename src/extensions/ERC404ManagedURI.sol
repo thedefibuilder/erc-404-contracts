@@ -8,8 +8,6 @@ import { ERC404, IERC404 } from "src/ERC404.sol";
 contract ERC404ManagedURI is Ownable, ERC404 {
     using Strings for uint256;
 
-    error ZeroArtifacts();
-    error ArtifactsGreaterThanTotalSupply();
     error MustBeFractionalizedAmount();
     error TotalSupplyExceeded();
 
@@ -17,7 +15,6 @@ contract ERC404ManagedURI is Ownable, ERC404 {
     event BatchMetadataUpdate(uint256 fromTokenId, uint256 toTokenId);
 
     bytes4 private constant ERC4906_INTERFACE_ID = bytes4(0x49064906);
-    uint256 private _totalArtifacts;
     string public baseURI;
 
     constructor(
@@ -55,17 +52,12 @@ contract ERC404ManagedURI is Ownable, ERC404 {
 
     /// @notice Sets metadata information for the whole collection.
     /// @param uri The base URI for the token.
-    /// @param totalArtifacts The total number of items that were inserted in metadata folder.
-    function setBaseURI(string memory uri, uint256 totalArtifacts) public onlyOwner {
-        if (totalArtifacts == 0) revert ZeroArtifacts();
-        if (totalArtifacts > totalSupply / _UNIT) revert ArtifactsGreaterThanTotalSupply();
-
+    function setBaseURI(string memory uri) public onlyOwner {
         if (bytes(baseURI).length > 0) {
             emit BatchMetadataUpdate(0, minted);
         }
 
         baseURI = uri;
-        _totalArtifacts = totalArtifacts;
     }
 
     /// @inheritdoc IERC404
@@ -77,7 +69,7 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         if (bytes(base).length > 0) {
             // This is necessary because tokenId can exceed the totalNFTSupply
             uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
-            uint256 artifactId = seed % (_totalArtifacts);
+            uint256 artifactId = seed % (totalSupply / _UNIT) + 1;
 
             return string.concat(base, artifactId.toString());
         }
