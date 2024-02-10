@@ -8,10 +8,16 @@ import { ERC404, IERC404 } from "src/ERC404.sol";
 contract ERC404ManagedURI is Ownable, ERC404 {
     using Strings for uint256;
 
+    error ZeroArtifacts();
+    error ArtifactsGreaterThanTotalSupply();
+    error MustBeFractionalizedAmount();
+    error TotalSupplyExceeded();
+
     event MetadataUpdate(uint256 tokenId);
     event BatchMetadataUpdate(uint256 fromTokenId, uint256 toTokenId);
 
     bytes4 private constant ERC4906_INTERFACE_ID = bytes4(0x49064906);
+    uint256 private _totalArtifacts;
     string public baseURI;
 
     constructor(
@@ -24,16 +30,40 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         Ownable(initialOwner)
     { }
 
+    function mintERC20(address to, uint256 amount) external onlyOwner {
+        if (amount <= minted) revert MustBeFractionalizedAmount();
+        if (amount > totalSupply - currentSupply) revert TotalSupplyExceeded();
+
+        uint256 balanceBeforeReceiver = balanceOf[to];
+        uint256 balanceReceiverNow = balanceBeforeReceiver + amount;
+        unchecked {
+            balanceOf[to] += balanceReceiverNow;
+        }
+        uint256 tokensToMint = (balanceReceiverNow / _UNIT) - (balanceBeforeReceiver / _UNIT);
+        for (uint256 i = 0; i < tokensToMint; i++) {
+            _mint(to);
+        }
+
+        emit ERC20Transfer(address(0), to, amount);
+    }
+
     function owner() public view override(IERC404, Ownable) returns (address) {
         return super.owner();
     }
 
-    function setBaseURI(string memory uri) public onlyOwner {
+    /// @notice Sets metadata information for the whole collection.
+    /// @param uri The base URI for the token.
+    /// @param totalArtifacts The total number of items that were inserted in metadata folder.
+    function setBaseURI(string memory uri, uint256 totalArtifacts) public onlyOwner {
+        if (totalArtifacts == 0) revert ZeroArtifacts();
+        if (totalArtifacts > totalSupply / _UNIT) revert ArtifactsGreaterThanTotalSupply();
+
         if (bytes(baseURI).length > 0) {
             emit BatchMetadataUpdate(0, minted);
         }
 
         baseURI = uri;
+        _totalArtifacts = totalArtifacts;
     }
 
     /// @inheritdoc IERC404
@@ -45,11 +75,10 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         if (bytes(base).length > 0) {
             // This is necessary because tokenId can exceed the totalNFTSupply
             uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
-            uint256 uriId = seed % (totalSupply / _UNIT);
+            uint256 artifactId = seed % (_totalArtifacts);
 
-            return string.concat(base, uriId.toString());
+            return string.concat(base, artifactId.toString());
         }
-
         return "";
     }
 

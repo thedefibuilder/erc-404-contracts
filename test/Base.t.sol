@@ -14,16 +14,12 @@ contract BaseTest is PRBTest, StdCheats {
     Users public users;
 
     function setUp() public virtual {
-        users = Users({
-            admin: createUser("admin");,
-            stranger: createUser("stranger"),
-            vault: createUser("vault")
-        });
+        users = Users({ admin: createUser("admin"), stranger: createUser("stranger"), vault: createUser("vault") });
 
         vm.startPrank(users.admin);
     }
 
-    function createUser(string memory name) public returns(address account) {
+    function createUser(string memory name) public returns (address account) {
         account = makeAddr(name);
         deal(account, type(uint256).max);
     }

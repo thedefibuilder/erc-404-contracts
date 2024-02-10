@@ -20,7 +20,10 @@ interface IERC404 is IERC165 {
     error Unauthorized();
 
     /// @notice Current mint counter, monotonically increasing to ensure accurate ownership.
-    function minted() external view returns (uint256);
+    function minted() external view returns (uint128);
+
+    /// @notice Current ERC20 supply counter in fractionalized amount.
+    function currentSupply() external view returns (uint128);
 
     /// @notice Mandatory function to ensure compatibility with NFT marketplaces.
     function owner() external view returns (address);

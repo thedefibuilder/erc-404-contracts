@@ -21,7 +21,8 @@ abstract contract ERC404 is IERC404, ERC165 {
     uint256 public immutable totalSupply;
 
     /// @inheritdoc IERC404
-    uint256 public minted;
+    uint128 public minted;
+    uint128 public currentSupply;
 
     /// @inheritdoc IERC404
     mapping(address user => uint256 balance) public balanceOf;
@@ -92,20 +93,13 @@ abstract contract ERC404 is IERC404, ERC165 {
     /// @inheritdoc IERC404
     function transferFrom(address from, address to, uint256 amountOrId) public virtual {
         if (amountOrId <= minted) {
-            if (from != _ownerOf[amountOrId]) {
-                revert InvalidSender();
-            }
-
-            if (to == address(0)) {
-                revert InvalidRecipient();
-            }
-
+            if (from != _ownerOf[amountOrId]) revert InvalidSender();
+            if (to == address(0)) revert InvalidRecipient();
             if (msg.sender != from && !isApprovedForAll[from][msg.sender] && msg.sender != getApproved[amountOrId]) {
                 revert Unauthorized();
             }
 
             balanceOf[from] -= _UNIT;
-
             unchecked {
                 balanceOf[to] += _UNIT;
             }
@@ -205,19 +199,14 @@ abstract contract ERC404 is IERC404, ERC165 {
     }
 
     function _mint(address to) internal virtual {
-        if (to == address(0)) {
-            revert InvalidRecipient();
-        }
+        if (to == address(0)) revert InvalidRecipient();
 
         unchecked {
             minted++;
         }
-
         uint256 id = minted;
 
-        if (_ownerOf[id] != address(0)) {
-            revert AlreadyExists();
-        }
+        if (_ownerOf[id] != address(0)) revert AlreadyExists();
 
         _ownerOf[id] = to;
         _owned[to].push(id);
@@ -227,9 +216,7 @@ abstract contract ERC404 is IERC404, ERC165 {
     }
 
     function _burn(address from) internal virtual {
-        if (from == address(0)) {
-            revert InvalidSender();
-        }
+        if (from == address(0)) revert InvalidSender();
 
         uint256 id = _owned[from][_owned[from].length - 1];
         _owned[from].pop();
@@ -243,9 +230,7 @@ abstract contract ERC404 is IERC404, ERC165 {
     function _requireOwned(uint256 id) internal view returns (address owner) {
         owner = _ownerOf[id];
 
-        if (_ownerOf[id] == address(0)) {
-            revert NotFound();
-        }
+        if (_ownerOf[id] == address(0)) revert NotFound();
     }
 
     /// @notice Internal function to check if an address is exempted from NFT mint/burn on transfer.
