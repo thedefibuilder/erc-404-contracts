@@ -9,7 +9,7 @@ contract ERC404_approve is ERC404Test {
         super.setUp();
 
         vm.startPrank(users.deployer);
-        erc404.mintERC20(users.deployer, erc404.totalSupply());
+        erc404.mint(users.deployer, uint128(erc404.totalSupply()));
     }
 
     function testFuzz_WhenERC721_RevertsIf_NotAuthorized(uint256 tokenId) public {

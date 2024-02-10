@@ -6,7 +6,7 @@ import { IFactory } from "src/factory/IFactory.sol";
 import { FactoryTest } from "test/factory/Factory.t.sol";
 
 contract Factory_setDeploymentFee is FactoryTest {
-    function test_RevertsWhen_NotOwner() public {
+    function test_RevertsIf_NotOwner() public {
         vm.startPrank(users.stranger);
 
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, users.stranger));

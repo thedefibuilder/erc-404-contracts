@@ -30,21 +30,23 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         Ownable(initialOwner)
     { }
 
-    function mintERC20(address to, uint256 amount) external onlyOwner {
-        if (amount <= minted) revert MustBeFractionalizedAmount();
-        if (amount > totalSupply - currentSupply) revert TotalSupplyExceeded();
+    function mint(address to, uint128 erc20Amount) external onlyOwner {
+        if (erc20Amount <= minted) revert MustBeFractionalizedAmount();
+        if (erc20Amount > totalSupply - currentSupply) revert TotalSupplyExceeded();
 
         uint256 balanceBeforeReceiver = balanceOf[to];
-        uint256 balanceReceiverNow = balanceBeforeReceiver + amount;
+        uint256 balanceReceiverNow;
         unchecked {
-            balanceOf[to] += balanceReceiverNow;
+            balanceReceiverNow = balanceBeforeReceiver + erc20Amount;
+            currentSupply = currentSupply + erc20Amount;
         }
+        balanceOf[to] = balanceReceiverNow;
         uint256 tokensToMint = (balanceReceiverNow / _UNIT) - (balanceBeforeReceiver / _UNIT);
         for (uint256 i = 0; i < tokensToMint; i++) {
             _mint(to);
         }
 
-        emit ERC20Transfer(address(0), to, amount);
+        emit ERC20Transfer(address(0), to, erc20Amount);
     }
 
     function owner() public view override(IERC404, Ownable) returns (address) {

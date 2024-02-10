@@ -6,7 +6,7 @@ import { IFactory } from "src/factory/IFactory.sol";
 import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 
 contract Factory_deployERC404 is FactoryTest {
-    function testFuzz_RevertsWhen_DeploymentFeeNotEqual(uint256 deploymentFee) public {
+    function testFuzz_RevertsIf_DeploymentFeeNotEqual(uint256 deploymentFee) public {
         vm.assume(deploymentFee != factory.deploymentFee());
 
         vm.expectRevert(IFactory.InsufficientDeploymentFee.selector);
