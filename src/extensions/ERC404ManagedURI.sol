@@ -18,14 +18,17 @@ contract ERC404ManagedURI is Ownable, ERC404 {
     string public baseURI;
 
     constructor(
-        string memory name,
-        string memory symbol,
+        string memory name_,
+        string memory symbol_,
+        string memory baseURI_,
         uint256 totalNFTSupply,
         address initialOwner
     )
-        ERC404(name, symbol, 18, totalNFTSupply)
+        ERC404(name_, symbol_, 18, totalNFTSupply)
         Ownable(initialOwner)
-    { }
+    {
+        baseURI = baseURI_;
+    }
 
     function mint(address to, uint128 erc20Amount) external onlyOwner {
         if (erc20Amount <= minted) revert MustBeFractionalizedAmount();
@@ -54,7 +57,7 @@ contract ERC404ManagedURI is Ownable, ERC404 {
     /// @param uri The base URI for the token.
     function setBaseURI(string memory uri) public onlyOwner {
         if (bytes(baseURI).length > 0) {
-            emit BatchMetadataUpdate(0, minted);
+            emit BatchMetadataUpdate(1, minted);
         }
 
         baseURI = uri;

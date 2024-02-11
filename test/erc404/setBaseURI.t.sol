@@ -9,8 +9,6 @@ import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 contract ERC404Test_setBaseURI is ERC404Test {
     using Strings for uint256;
 
-    string public constant BASE_URI = "https://example.com/";
-
     function setUp() public override {
         super.setUp();
 
@@ -27,10 +25,7 @@ contract ERC404Test_setBaseURI is ERC404Test {
     }
 
     function test_TokenURIsAreMapped() public {
-        erc404.setBaseURI(BASE_URI);
-
         uint256 minted = erc404.minted();
-
         for (uint256 id = 1; id <= minted; id++) {
             uint256 artifactId = uint256(keccak256(abi.encodePacked(id))) % (erc404.totalSupply() / 1e18) + 1;
             string memory expectedURI = string(abi.encodePacked(BASE_URI, artifactId.toString()));
@@ -39,12 +34,10 @@ contract ERC404Test_setBaseURI is ERC404Test {
     }
 
     function test_IfReset_EmitsBatchMetadataUpdate() public {
-        erc404.setBaseURI(BASE_URI);
-
         uint256 minted = erc404.minted();
 
         vm.expectEmit(address(erc404));
-        emit ERC404ManagedURI.BatchMetadataUpdate(0, minted);
+        emit ERC404ManagedURI.BatchMetadataUpdate(1, minted);
 
         erc404.setBaseURI(BASE_URI);
     }

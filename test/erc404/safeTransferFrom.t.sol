@@ -17,7 +17,7 @@ contract ERC404Test_safeTransferFrom is ERC404Test {
         erc404.mint(users.deployer, 500e18);
     }
 
-    function onERC721Received(address, address, uint256, bytes memory) public returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes memory) public pure returns (bytes4) {
         return 0xc0ffeeba;
     }
 

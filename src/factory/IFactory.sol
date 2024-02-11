@@ -10,6 +10,7 @@ interface IFactory {
     function deployERC404(
         string memory name,
         string memory symbol,
+        string memory baseURI,
         uint256 totalNFTSupply
     )
         external

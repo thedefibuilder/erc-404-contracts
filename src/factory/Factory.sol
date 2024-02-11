@@ -18,6 +18,7 @@ contract Factory is IFactory, Ownable {
     function deployERC404(
         string memory name,
         string memory symbol,
+        string memory baseURI,
         uint256 totalNFTSupply
     )
         external
@@ -26,7 +27,7 @@ contract Factory is IFactory, Ownable {
     {
         if (msg.value != deploymentFee) revert InsufficientDeploymentFee();
 
-        ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, totalNFTSupply, msg.sender);
+        ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
         _deploymentsOf[msg.sender].push(address(erc404));
 
         emit ERC404Deployed(msg.sender, address(erc404));

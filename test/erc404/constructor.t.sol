@@ -13,6 +13,7 @@ contract ERC404Test_constructor is ERC404Test {
         assertEq(erc404.decimals(), 18);
         assertEq(erc404.totalSupply(), TOTAL_NFT_SUPPLY * 10 ** 18);
         assertEq(erc404.owner(), users.deployer);
+        assertNotEq(bytes(erc404.baseURI()).length, 0);
 
         assertTrue(erc404.supportsInterface(ERC4906_INTERFACE_ID));
         assertTrue(erc404.supportsInterface(type(IERC20).interfaceId));

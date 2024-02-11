@@ -10,7 +10,7 @@ contract Factory_deployERC404 is FactoryTest {
         vm.assume(deploymentFee != factory.deploymentFee());
 
         vm.expectRevert(IFactory.InsufficientDeploymentFee.selector);
-        factory.deployERC404("name", "symbol", 1);
+        factory.deployERC404("name", "symbol", "baseURI", 1);
     }
 
     function test_DeploysERC404() public {
@@ -20,14 +20,14 @@ contract Factory_deployERC404 is FactoryTest {
         vm.expectEmit(true, false, false, false);
         emit IFactory.ERC404Deployed(users.stranger, address(0));
 
-        address erc404 = factory.deployERC404{ value: initialDeploymentFee }("name", "symbol", 1);
+        address erc404 = factory.deployERC404{ value: initialDeploymentFee }("name", "symbol", "baseURI", 1);
 
         assertEq(factory.deploymentsOf(users.stranger).length, 1);
         assertEq(factory.deploymentsOf(users.stranger)[0], erc404);
         assertEq(address(factory.vault()).balance, vaultBalanceBefore + initialDeploymentFee);
 
         // Assert that ERC404ManagedURI was deployed
-        address otherERC404 = address(new ERC404ManagedURI("name", "symbol", 1, users.stranger));
+        address otherERC404 = address(new ERC404ManagedURI("name", "symbol", "baseURI", 1, users.stranger));
         assertEq(erc404.codehash, otherERC404.codehash);
     }
 }

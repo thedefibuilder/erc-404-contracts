@@ -9,11 +9,12 @@ contract ERC404Test is BaseTest {
 
     string public constant NAME = "name";
     string public constant SYMBOL = "symbol";
+    string public constant BASE_URI = "https://example.com/";
     uint256 public constant TOTAL_NFT_SUPPLY = 10_000;
 
     function setUp() public virtual override {
         super.setUp();
 
-        erc404 = new ERC404ManagedURI("name", "symbol", TOTAL_NFT_SUPPLY, users.deployer);
+        erc404 = new ERC404ManagedURI("name", "symbol", BASE_URI, TOTAL_NFT_SUPPLY, users.deployer);
     }
 }
