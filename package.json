@@ -1,10 +1,10 @@
 {
-  "name": "@prb/foundry-template",
-  "description": "Foundry-based template for developing Solidity smart contracts",
+  "name": "erc404-contracts",
+  "description": "Contracts library for ERC404 Builder",
   "version": "1.0.0",
   "author": {
-    "name": "Paul Razvan Berg",
-    "url": "https://github.com/PaulRBerg"
+    "name": "Alexe Luca Spataru",
+    "url": "https://github.com/urataps"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1"
