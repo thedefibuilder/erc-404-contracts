@@ -95,7 +95,8 @@ abstract contract ERC404 is IERC404, ERC165 {
         if (amountOrId <= minted) {
             if (from != _ownerOf[amountOrId]) revert InvalidSender();
             if (to == address(0)) revert InvalidRecipient();
-            if (msg.sender != from && !isApprovedForAll[from][msg.sender] && msg.sender != getApproved[amountOrId]) {
+            address approvedOperator = getApproved[amountOrId];
+            if (msg.sender != from && !isApprovedForAll[from][msg.sender] && msg.sender != approvedOperator) {
                 revert Unauthorized();
             }
 
@@ -105,12 +106,15 @@ abstract contract ERC404 is IERC404, ERC165 {
             }
 
             _ownerOf[amountOrId] = to;
-            delete getApproved[amountOrId];
+            if (approvedOperator != address(0)) {
+                delete getApproved[amountOrId];
+            }
 
             uint256 updatedId = _owned[from][_owned[from].length - 1];
-            _owned[from][_ownedIndex[amountOrId]] = updatedId;
+            uint256 ownedIndex = _ownedIndex[amountOrId];
+            _owned[from][ownedIndex] = updatedId;
             _owned[from].pop();
-            _ownedIndex[updatedId] = _ownedIndex[amountOrId];
+            _ownedIndex[updatedId] = ownedIndex;
             _owned[to].push(amountOrId);
             _ownedIndex[amountOrId] = _owned[to].length - 1;
 
@@ -134,19 +138,11 @@ abstract contract ERC404 is IERC404, ERC165 {
 
     /// @inheritdoc IERC404
     function safeTransferFrom(address from, address to, uint256 id) public virtual {
-        transferFrom(from, to, id);
-
-        if (
-            to.code.length != 0
-                && IERC721Receiver(to).onERC721Received(msg.sender, from, id, "")
-                    != IERC721Receiver.onERC721Received.selector
-        ) {
-            revert UnsafeRecipient();
-        }
+        safeTransferFrom(from, to, id, bytes(""));
     }
 
     /// @inheritdoc IERC404
-    function safeTransferFrom(address from, address to, uint256 id, bytes calldata data) public virtual {
+    function safeTransferFrom(address from, address to, uint256 id, bytes memory data) public virtual {
         transferFrom(from, to, id);
 
         if (
@@ -206,11 +202,9 @@ abstract contract ERC404 is IERC404, ERC165 {
         }
         uint256 id = minted;
 
-        if (_ownerOf[id] != address(0)) revert AlreadyExists();
-
         _ownerOf[id] = to;
+        _ownedIndex[id] = _owned[to].length;
         _owned[to].push(id);
-        _ownedIndex[id] = _owned[to].length - 1;
 
         emit Transfer(address(0), to, id);
     }
