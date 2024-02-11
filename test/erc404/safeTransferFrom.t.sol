@@ -3,6 +3,7 @@ pragma solidity >=0.8.23;
 
 import { ERC404Test } from "test/erc404/ERC404.t.sol";
 import { MockERC721Receiver, ERC721Holder } from "test/mocks/ERC721Receiver.t.sol";
+import { IERC404 } from "src/IERC404.sol";
 
 contract ERC404Test_safeTransferFrom is ERC404Test {
     MockERC721Receiver public mockReceiver;
@@ -14,6 +15,15 @@ contract ERC404Test_safeTransferFrom is ERC404Test {
 
         vm.startPrank(users.deployer);
         erc404.mint(users.deployer, 500e18);
+    }
+
+    function onERC721Received(address, address, uint256, bytes memory) public returns (bytes4) {
+        return 0xc0ffeeba;
+    }
+
+    function test_RevertsIf_CalleIsNotERC721Receiver() public {
+        vm.expectRevert(IERC404.UnsafeRecipient.selector);
+        erc404.safeTransferFrom(users.deployer, address(this), 1);
     }
 
     function test_MakesERC721ReceiverCall(bytes memory data) public {

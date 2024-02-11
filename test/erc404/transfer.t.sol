@@ -52,8 +52,7 @@ contract ERC404Test_transfer is ERC404Test {
     }
 
     function testFuzz_ReceiverERC721BalanceIsMinted(uint256 amount) public {
-        uint256 balance = erc404.balanceOf(users.stranger);
-        vm.assume(balance >= amount);
+        vm.assume(amount >= 1e18 && amount < erc404.balanceOf(users.deployer));
         uint256 nextTokenId = erc404.minted() + 1;
         uint256 nftsToMint = amount / 1e18;
 

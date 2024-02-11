@@ -45,7 +45,7 @@ contract ERC404_approve is ERC404Test {
     }
 
     function testFuzz_WhenERC20_SetsAllowance(uint256 amount) public {
-        vm.assume(amount >= erc404.minted() || amount == 0);
+        vm.assume(amount > erc404.minted() || amount == 0);
         vm.startPrank(users.deployer);
 
         vm.expectEmit();

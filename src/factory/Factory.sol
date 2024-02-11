@@ -6,7 +6,7 @@ import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 import { IFactory } from "./IFactory.sol";
 
 contract Factory is IFactory, Ownable {
-    address public vault;
+    address public immutable vault;
     uint256 public deploymentFee;
     mapping(address deployer => address[] deployments) internal _deploymentsOf;
 
