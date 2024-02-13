@@ -42,6 +42,18 @@ contract Factory_deployERC404 is FactoryTest {
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
     }
 
+    function test_AfterFreePeriod_DeploymentIsNotFree() public {
+        Factory.FreePeriod memory freePeriod =
+            Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
+        vm.startPrank(users.admin);
+        factory.setFreePeriod(freePeriod);
+
+        skip(1 days);
+
+        vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
+        factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
+    }
+
     function test_IfSentMore_RefundsUser() public {
         vm.startPrank(users.deployer);
         uint256 vaultBalanceBefore = address(factory.vault()).balance;

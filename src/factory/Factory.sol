@@ -49,7 +49,13 @@ contract Factory is Ownable {
         payable
         returns (address)
     {
-        uint128 fee = deploymentFee();
+        uint128 fee = _deploymentFee;
+        if (_isFreePeriod()) {
+            // If the user has already deployed, they have to pay the fee.
+            if (_deploymentsOf[msg.sender].length == 0) {
+                fee = 0;
+            }
+        }
         if (msg.value < fee) revert InsufficientDeploymentFee();
 
         ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
@@ -89,10 +95,6 @@ contract Factory is Ownable {
     /// @notice The fee required to deploy a new contract.
     /// @dev The fee is 0 during the free period if user hasn't already deployed.
     function deploymentFee() public view returns (uint128) {
-        if (_isFreePeriod()) {
-            if (_deploymentsOf[msg.sender].length > 0) return _deploymentFee;
-            return 0;
-        }
         return _deploymentFee;
     }
 

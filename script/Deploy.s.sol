@@ -10,6 +10,6 @@ contract Deploy is BaseScript {
     function run() public broadcast {
         Factory.FreePeriod memory freePeriod =
             Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
-        factory = new Factory(broadcaster, 0.01e18, broadcaster, freePeriod);
+        factory = new Factory(0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd, 0.01e18, broadcaster, freePeriod);
     }
 }
