@@ -62,13 +62,14 @@ contract Factory is Ownable {
         _deploymentsOf[msg.sender].push(address(erc404));
 
         emit ERC404Deployed(msg.sender, address(erc404));
-        if (msg.value > 0) {
+
+        if (fee > 0) {
             payable(vault).transfer(fee);
-            // Refund the user if they sent more than the deployment fee.
-            if (msg.value > fee) {
-                unchecked {
-                    payable(msg.sender).transfer(msg.value - fee);
-                }
+        }
+        // Refund the user if they sent more than the deployment fee.
+        if (msg.value > fee) {
+            unchecked {
+                payable(msg.sender).transfer(msg.value - fee);
             }
         }
 
