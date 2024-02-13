@@ -3,16 +3,40 @@ pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
-import { IFactory } from "./IFactory.sol";
 
-contract Factory is IFactory, Ownable {
+contract Factory is Ownable {
+    error InsufficientDeploymentFee();
+    error StartTimeTooBig();
+    error EndTimeTooSmall();
+
+    event FreePeriodChanged(FreePeriod newFreePeriod);
+    event DeploymentFeeChanged(uint128 oldDeploymentFee, uint128 newDeploymentFee);
+    event ERC404Deployed(address indexed deployer, address indexed erc404);
+
+    struct FreePeriod {
+        uint64 start;
+        uint64 end;
+    }
+
+    /// @notice The address that will receive the deployment fees.
     address public immutable vault;
-    uint256 public deploymentFee;
+
+    // ----------------------- Internals -----------------------
+    FreePeriod internal _freePeriod;
+    uint128 internal _deploymentFee;
     mapping(address deployer => address[] deployments) internal _deploymentsOf;
 
-    constructor(address vault_, uint256 deploymentFee_, address admin_) Ownable(admin_) {
+    constructor(
+        address vault_,
+        uint128 deploymentFee_,
+        address admin_,
+        FreePeriod memory freePeriod_
+    )
+        Ownable(admin_)
+    {
         vault = vault_;
-        deploymentFee = deploymentFee_;
+        _deploymentFee = deploymentFee_;
+        _setFreePeriod(freePeriod_);
     }
 
     function deployERC404(
@@ -25,7 +49,7 @@ contract Factory is IFactory, Ownable {
         payable
         returns (address)
     {
-        if (msg.value != deploymentFee) revert InsufficientDeploymentFee();
+        if (msg.value != deploymentFee()) revert InsufficientDeploymentFee();
 
         ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
         _deploymentsOf[msg.sender].push(address(erc404));
@@ -38,13 +62,44 @@ contract Factory is IFactory, Ownable {
         return address(erc404);
     }
 
-    function setDeploymentFee(uint256 newDeploymentFee) external onlyOwner {
-        emit DeploymentFeeChanged(deploymentFee, newDeploymentFee);
+    /// @notice Set the fee required to deploy a new contract.
+    function setDeploymentFee(uint128 newDeploymentFee) external onlyOwner {
+        emit DeploymentFeeChanged(_deploymentFee, newDeploymentFee);
 
-        deploymentFee = newDeploymentFee;
+        _deploymentFee = newDeploymentFee;
     }
 
+    /// @notice Set the period during which deployments are free.
+    function setFreePeriod(FreePeriod memory newFreePeriod) external onlyOwner {
+        _setFreePeriod(newFreePeriod);
+    }
+
+    /// @notice The period during which deployments are free.
+    function freePeriod() external view returns (FreePeriod memory) {
+        return _freePeriod;
+    }
+
+    /// @notice The fee required to deploy a new contract.
+    /// @dev The fee is 0 during the free period.
+    function deploymentFee() public view returns (uint128) {
+        if (_freePeriod.start <= block.timestamp && block.timestamp < _freePeriod.end) {
+            return 0;
+        }
+        return _deploymentFee;
+    }
+
+    /// @notice Get all the contracts deployed by an user.
     function deploymentsOf(address owner) external view returns (address[] memory) {
         return _deploymentsOf[owner];
+    }
+
+    function _setFreePeriod(FreePeriod memory newFreePeriod) internal {
+        // End = 0 means the free period is disabled.
+        if (newFreePeriod.end > 0) {
+            if (newFreePeriod.start > newFreePeriod.end) revert StartTimeTooBig();
+            if (newFreePeriod.end < block.timestamp) revert EndTimeTooSmall();
+        }
+        _freePeriod = newFreePeriod;
+        emit FreePeriodChanged(newFreePeriod);
     }
 }

@@ -6,11 +6,12 @@ import { Factory } from "src/factory/Factory.sol";
 
 contract FactoryTest is BaseTest {
     Factory public factory;
-    uint256 public initialDeploymentFee = 0.01e18;
+    uint128 public initialDeploymentFee = 0.01e18;
+    Factory.FreePeriod public initialfreePeriod = Factory.FreePeriod({ start: uint64(block.timestamp), end: 0 });
 
     function setUp() public override {
         super.setUp();
 
-        factory = new Factory(users.vault, initialDeploymentFee, users.admin);
+        factory = new Factory(users.vault, initialDeploymentFee, users.admin, initialfreePeriod);
     }
 }

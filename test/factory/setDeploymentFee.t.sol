@@ -2,7 +2,7 @@
 pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { IFactory } from "src/factory/IFactory.sol";
+import { Factory } from "src/factory/Factory.sol";
 import { FactoryTest } from "test/factory/Factory.t.sol";
 
 contract Factory_setDeploymentFee is FactoryTest {
@@ -13,11 +13,11 @@ contract Factory_setDeploymentFee is FactoryTest {
         factory.setDeploymentFee(0.1e18);
     }
 
-    function test_ChangesOwner() public {
-        uint256 newDeploymentFee = 0.2e18;
+    function test_ChangesDeploymentFee() public {
+        uint128 newDeploymentFee = 0.2e18;
 
         vm.expectEmit(address(factory));
-        emit IFactory.DeploymentFeeChanged(factory.deploymentFee(), newDeploymentFee);
+        emit Factory.DeploymentFeeChanged(factory.deploymentFee(), newDeploymentFee);
 
         vm.startPrank(users.admin);
         factory.setDeploymentFee(newDeploymentFee);

@@ -10,6 +10,7 @@
     "no-console": "off",
     "not-rely-on-time": "off",
     "one-contract-per-file": "off",
-    "contract-name-camelcase": "off"
+    "contract-name-camelcase": "off",
+    "immutable-vars-naming": "off"
   }
 }
