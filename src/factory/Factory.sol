@@ -49,14 +49,21 @@ contract Factory is Ownable {
         payable
         returns (address)
     {
-        if (msg.value != deploymentFee()) revert InsufficientDeploymentFee();
+        uint128 fee = deploymentFee();
+        if (msg.value < fee) revert InsufficientDeploymentFee();
 
         ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
         _deploymentsOf[msg.sender].push(address(erc404));
 
         emit ERC404Deployed(msg.sender, address(erc404));
         if (msg.value > 0) {
-            payable(vault).transfer(msg.value);
+            payable(vault).transfer(fee);
+            // Refund the user if they sent more than the deployment fee.
+            if (msg.value > fee) {
+                unchecked {
+                    payable(msg.sender).transfer(msg.value - fee);
+                }
+            }
         }
 
         return address(erc404);
@@ -80,9 +87,10 @@ contract Factory is Ownable {
     }
 
     /// @notice The fee required to deploy a new contract.
-    /// @dev The fee is 0 during the free period.
+    /// @dev The fee is 0 during the free period if user hasn't already deployed.
     function deploymentFee() public view returns (uint128) {
-        if (_freePeriod.start <= block.timestamp && block.timestamp < _freePeriod.end) {
+        if (_isFreePeriod()) {
+            if (_deploymentsOf[msg.sender].length > 0) return _deploymentFee;
             return 0;
         }
         return _deploymentFee;
@@ -91,6 +99,11 @@ contract Factory is Ownable {
     /// @notice Get all the contracts deployed by an user.
     function deploymentsOf(address owner) external view returns (address[] memory) {
         return _deploymentsOf[owner];
+    }
+
+    function _isFreePeriod() internal view returns (bool) {
+        FreePeriod memory period = _freePeriod;
+        return period.start <= block.timestamp && block.timestamp < period.end;
     }
 
     function _setFreePeriod(FreePeriod memory newFreePeriod) internal {

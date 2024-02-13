@@ -13,7 +13,7 @@ contract Factory_deployERC404 is FactoryTest {
         factory.deployERC404{ value: deploymentFee }("name", "symbol", "baseURI", 1);
     }
 
-    function testFuzz_DuringFreePeriod_DeploymentIsFree() public {
+    function test_DuringFreePeriod_DeploymentIsFree() public {
         Factory.FreePeriod memory freePeriod =
             Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
         vm.startPrank(users.admin);
@@ -27,6 +27,33 @@ contract Factory_deployERC404 is FactoryTest {
 
         assertEq(factory.deploymentsOf(users.stranger).length, 1);
         assertEq(factory.deploymentsOf(users.stranger)[0], erc404);
+    }
+
+    function test_DuringFreePeriod_NotFreeIfAlreadyDeployed() public {
+        Factory.FreePeriod memory freePeriod =
+            Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
+        vm.startPrank(users.admin);
+        factory.setFreePeriod(freePeriod);
+
+        vm.startPrank(users.stranger);
+        factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
+
+        vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
+        factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
+    }
+
+    function test_IfSentMore_RefundsUser() public {
+        vm.startPrank(users.deployer);
+        uint256 vaultBalanceBefore = address(factory.vault()).balance;
+        uint256 deployerBalanceBefore = address(users.deployer).balance;
+
+        vm.expectEmit(true, false, false, false);
+        emit Factory.ERC404Deployed(users.deployer, address(0));
+
+        factory.deployERC404{ value: initialDeploymentFee + 1e10 }("name", "symbol", "baseURI", 1);
+
+        assertEq(address(factory.vault()).balance, vaultBalanceBefore + initialDeploymentFee);
+        assertEq(address(users.deployer).balance, deployerBalanceBefore - initialDeploymentFee);
     }
 
     function test_DeploysERC404() public {
