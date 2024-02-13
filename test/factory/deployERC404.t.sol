@@ -38,6 +38,7 @@ contract Factory_deployERC404 is FactoryTest {
         vm.startPrank(users.stranger);
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
 
+        assertNotEq(factory.deploymentFeeForUser(users.stranger), 0);
         vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
     }

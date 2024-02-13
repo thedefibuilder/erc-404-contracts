@@ -23,5 +23,6 @@ contract Factory_setDeploymentFee is FactoryTest {
         factory.setDeploymentFee(newDeploymentFee);
 
         assertEq(factory.deploymentFee(), newDeploymentFee);
+        assertEq(factory.deploymentFeeForUser(users.stranger), newDeploymentFee);
     }
 }

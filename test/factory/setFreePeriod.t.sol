@@ -30,7 +30,7 @@ contract Factory_setFreePeriod is FactoryTest {
     }
 
     function test_ChangesFreePeriod() public {
-        Factory.FreePeriod memory newFreePeriod = Factory.FreePeriod({ start: 0, end: 0 });
+        Factory.FreePeriod memory newFreePeriod = Factory.FreePeriod({ start: 0, end: type(uint64).max });
 
         vm.expectEmit(address(factory));
         emit Factory.FreePeriodChanged(newFreePeriod);
@@ -40,5 +40,6 @@ contract Factory_setFreePeriod is FactoryTest {
 
         assertEq(factory.freePeriod().start, newFreePeriod.start);
         assertEq(factory.freePeriod().end, newFreePeriod.end);
+        assertEq(factory.deploymentFeeForUser(users.stranger), 0);
     }
 }
