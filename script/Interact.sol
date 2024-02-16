@@ -5,15 +5,12 @@ import { BaseScript } from "./Base.s.sol";
 import { Factory } from "src/factory/Factory.sol";
 import { console } from "forge-std/src/console.sol";
 
-contract Deploy is BaseScript {
-    Factory public factory;
+contract Interact is BaseScript {
+    Factory public factory = Factory(0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E);
 
     Factory.FreePeriod public freePeriod = Factory.FreePeriod({ start: 0, end: 1_708_088_400 });
 
     function run() public broadcast {
-        // Polygon = 30e18 MATIC
-        // BNB = 0.1e18 BNB
-        // LINEA & ARBITRUM = 0.01e18 ETH
-        new Factory(0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd, 0.01e18, broadcaster, freePeriod);
+        factory.setDeploymentFee(0.1e18);
     }
 }
