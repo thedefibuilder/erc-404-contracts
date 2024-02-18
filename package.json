@@ -7,7 +7,11 @@
     "url": "https://github.com/urataps"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1"
+    "@nomicfoundation/hardhat-foundry": "^1.1.1",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.1",
+    "dotenv": "^16.4.4",
+    "hardhat-deploy": "^0.11.45"
   },
   "devDependencies": {
     "@prb/test": "^0.6.4",

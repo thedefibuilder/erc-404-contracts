@@ -1,5 +1,7 @@
 # directories
-cache
+*cache
+artifacts
+typechain
 coverage
 node_modules
 out
