@@ -4,7 +4,7 @@ pragma solidity >=0.8.23;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
 
-contract Factory is Ownable {
+contract ERC404LegacyFactory is Ownable {
     error InsufficientDeploymentFee();
     error StartTimeTooBig();
     error EndTimeTooSmall();

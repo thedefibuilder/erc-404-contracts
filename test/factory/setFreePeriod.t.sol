@@ -2,38 +2,39 @@
 pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { FactoryTest } from "test/factory/Factory.t.sol";
-import { Factory } from "src/factory/Factory.sol";
+import { ERC404LegacyFactoryTest } from "test/factory/ERC404LegacyFactory.t.sol";
+import { ERC404LegacyFactory } from "src/factory/ERC404LegacyFactory.sol";
 
-contract Factory_setFreePeriod is FactoryTest {
+contract ERC404LegacyFactory_setFreePeriod is ERC404LegacyFactoryTest {
     function test_RevertsIf_NotOwner() public {
         vm.startPrank(users.stranger);
 
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, users.stranger));
-        factory.setFreePeriod(Factory.FreePeriod({ start: 0, end: 0 }));
+        factory.setFreePeriod(ERC404LegacyFactory.FreePeriod({ start: 0, end: 0 }));
     }
 
     function test_RevertsIf_StartBiggerThanEnd(uint64 start, uint64 end) public {
         vm.assume(start > end && end > 0);
 
-        vm.expectRevert(Factory.StartTimeTooBig.selector);
+        vm.expectRevert(ERC404LegacyFactory.StartTimeTooBig.selector);
         vm.startPrank(users.admin);
-        factory.setFreePeriod(Factory.FreePeriod({ start: start, end: end }));
+        factory.setFreePeriod(ERC404LegacyFactory.FreePeriod({ start: start, end: end }));
     }
 
     function test_RevertsIf_EndSmallerThanBlockTimestamp(uint64 start, uint64 end) public {
         vm.assume(start < end && end < block.timestamp && end > 0);
 
-        vm.expectRevert(Factory.EndTimeTooSmall.selector);
+        vm.expectRevert(ERC404LegacyFactory.EndTimeTooSmall.selector);
         vm.startPrank(users.admin);
-        factory.setFreePeriod(Factory.FreePeriod({ start: start, end: end }));
+        factory.setFreePeriod(ERC404LegacyFactory.FreePeriod({ start: start, end: end }));
     }
 
     function test_ChangesFreePeriod() public {
-        Factory.FreePeriod memory newFreePeriod = Factory.FreePeriod({ start: 0, end: type(uint64).max });
+        ERC404LegacyFactory.FreePeriod memory newFreePeriod =
+            ERC404LegacyFactory.FreePeriod({ start: 0, end: type(uint64).max });
 
         vm.expectEmit(address(factory));
-        emit Factory.FreePeriodChanged(newFreePeriod);
+        emit ERC404LegacyFactory.FreePeriodChanged(newFreePeriod);
 
         vm.startPrank(users.admin);
         factory.setFreePeriod(newFreePeriod);
