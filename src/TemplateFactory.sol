@@ -3,10 +3,18 @@ pragma solidity 0.8.24;
 
 import { UUPSUpgradeable } from "@ozu/proxy/utils/UUPSUpgradeable.sol";
 import { OwnableUpgradeable } from "@ozu/access/OwnableUpgradeable.sol";
+import { Clones } from "@oz/proxy/Clones.sol";
+import { Create2 } from "@oz/utils/Create2.sol";
+import { Address } from "@oz/utils/Address.sol";
+import { SSTORE2 } from "@solmate/utils/SSTORE2.sol";
 
 contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
+    using Clones for address;
+    using Address for address;
+    using SSTORE2 for address;
+
+    error ImplementationNotFound();
     error TemplateNotSupported();
-    error TemplateNotFound();
 
     event TemplateSet(bytes32 indexed id, address indexed implementation, TemplateType templateType, uint88 fee);
     event TemplateDeployed(bytes32 indexed id, address indexed instance, address indexed user);
@@ -29,16 +37,20 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     mapping(bytes32 id => Template template) internal _templates;
 
     /// @notice Sets a template, used both for upserting and deleting templates.
-    function setTemplate(bytes32 templateId, Template memory template) external onlyOwner {
+    function setTemplate(bytes32 templateId, Template calldata template) external onlyOwner {
         _templates[templateId] = template;
 
         emit TemplateSet(templateId, template.implementation, template.templateType, template.deploymentFee);
     }
 
     /// @notice Deploys a template for the calling user.
+    /// @param templateId The id of the template to deploy
+    /// @param initData The data to be used in the initializer/constructor of deployed contract.
+    /// @dev For proxy clones, initData should include selector.
     function deployTemplate(bytes32 templateId, bytes calldata initData) external returns (address instance) {
         Template memory template = _templates[templateId];
-        if (template.implementation == address(0)) revert TemplateNotFound();
+        // This reverts if implementation == address(0) as well.
+        if (template.implementation.code.length == 0) revert ImplementationNotFound();
 
         if (template.templateType == TemplateType.SimpleContract) {
             instance = _deploySimpleContract(template.implementation, initData);
@@ -67,10 +79,18 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         internal
         returns (address instance)
     {
-        // solhint-disable-previous-line no-empty-blocks
+        bytes memory bytecode = codePointer.read();
+        if (constructorArgs.length > 0) {
+            bytecode = abi.encode(bytecode, constructorArgs);
+        }
+        bytes32 salt = keccak256(abi.encode(msg.sender, block.timestamp));
+        instance = Create2.deploy(0, salt, bytecode);
     }
 
     function _deployProxyClone(address implementation, bytes calldata initData) internal returns (address instance) {
-        // solhint-disable-previous-line no-empty-blocks
+        instance = implementation.clone();
+        if (initData.length > 0) {
+            instance.functionCall(initData);
+        }
     }
 }

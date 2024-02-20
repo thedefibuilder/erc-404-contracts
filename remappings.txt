@@ -1,4 +1,5 @@
-@oz=node_modules/@openzeppelin/contracts/
-@ozu=node_modules/@openzeppelin/contracts-upgradeable/
+@oz=node_modules/@openzeppelin/contracts
+@ozu=node_modules/@openzeppelin/contracts-upgradeable
+@solmate=node_modules/solmate/src
 @prb/test/=node_modules/@prb/test/
 forge-std/=node_modules/forge-std/

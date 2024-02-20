@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
-    "@openzeppelin/contracts-upgradeable": "^5.0.1"
+    "@openzeppelin/contracts-upgradeable": "^5.0.1",
+    "solmate": "^6.2.0"
   },
   "devDependencies": {
     "@prb/test": "^0.6.4",
