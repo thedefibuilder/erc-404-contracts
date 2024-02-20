@@ -3,9 +3,9 @@ pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { ERC404, IERC404 } from "src/ERC404.sol";
+import { ERC404Legacy, IERC404Legacy } from "src/legacy/ERC404Legacy.sol";
 
-contract ERC404ManagedURI is Ownable, ERC404 {
+contract ERC404LegacyManagedURI is Ownable, ERC404Legacy {
     using Strings for uint256;
 
     error MustBeFractionalizedAmount();
@@ -24,7 +24,7 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         uint256 totalNFTSupply,
         address initialOwner
     )
-        ERC404(name_, symbol_, 18, totalNFTSupply)
+        ERC404Legacy(name_, symbol_, 18, totalNFTSupply)
         Ownable(initialOwner)
     {
         baseURI = baseURI_;
@@ -49,7 +49,7 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         emit ERC20Transfer(address(0), to, erc20Amount);
     }
 
-    function owner() public view override(IERC404, Ownable) returns (address) {
+    function owner() public view override(IERC404Legacy, Ownable) returns (address) {
         return super.owner();
     }
 
@@ -63,7 +63,7 @@ contract ERC404ManagedURI is Ownable, ERC404 {
         baseURI = uri;
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { ERC404LegacyFactoryTest } from "test/factory/ERC404LegacyFactory.t.sol";
-import { ERC404LegacyFactory } from "src/factory/ERC404LegacyFactory.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { ERC404LegacyFactoryTest } from "./ERC404LegacyFactory.t.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
 contract ERC404LegacyFactory_deployERC404 is ERC404LegacyFactoryTest {
     function testFuzz_RevertsIf_DeploymentFeeNotEqual(uint128 deploymentFee) public {
@@ -82,8 +82,8 @@ contract ERC404LegacyFactory_deployERC404 is ERC404LegacyFactoryTest {
         assertEq(factory.deploymentsOf(users.stranger)[0], erc404);
         assertEq(address(factory.vault()).balance, vaultBalanceBefore + initialDeploymentFee);
 
-        // Assert that ERC404ManagedURI was deployed
-        address otherERC404 = address(new ERC404ManagedURI("name", "symbol", "baseURI", 1, users.stranger));
+        // Assert that ERC404LegacyManagedURI was deployed
+        address otherERC404 = address(new ERC404LegacyManagedURI("name", "symbol", "baseURI", 1, users.stranger));
         assertEq(erc404.codehash, otherERC404.codehash);
     }
 }

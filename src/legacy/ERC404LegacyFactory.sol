@@ -2,7 +2,7 @@
 pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
 contract ERC404LegacyFactory is Ownable {
     error InsufficientDeploymentFee();
@@ -52,7 +52,7 @@ contract ERC404LegacyFactory is Ownable {
         uint128 fee = deploymentFeeForUser(msg.sender);
         if (msg.value < fee) revert InsufficientDeploymentFee();
 
-        ERC404ManagedURI erc404 = new ERC404ManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
+        ERC404LegacyManagedURI erc404 = new ERC404LegacyManagedURI(name, symbol, baseURI, totalNFTSupply, msg.sender);
         _deploymentsOf[msg.sender].push(address(erc404));
 
         emit ERC404Deployed(msg.sender, address(erc404));

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
+import { ERC404Test } from "./ERC404.t.sol";
 import { MockERC721Receiver, ERC721Holder } from "test/mocks/ERC721Receiver.t.sol";
-import { IERC404 } from "src/IERC404.sol";
+import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
 contract ERC404Test_safeTransferFrom is ERC404Test {
     MockERC721Receiver public mockReceiver;
@@ -22,7 +22,7 @@ contract ERC404Test_safeTransferFrom is ERC404Test {
     }
 
     function test_RevertsIf_CalleIsNotERC721Receiver() public {
-        vm.expectRevert(IERC404.UnsafeRecipient.selector);
+        vm.expectRevert(IERC404Legacy.UnsafeRecipient.selector);
         erc404.safeTransferFrom(users.deployer, address(this), 1);
     }
 

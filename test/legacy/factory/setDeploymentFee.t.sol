@@ -2,8 +2,8 @@
 pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { ERC404LegacyFactory } from "src/factory/ERC404LegacyFactory.sol";
-import { ERC404LegacyFactoryTest } from "test/factory/ERC404LegacyFactory.t.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
+import { ERC404LegacyFactoryTest } from "./ERC404LegacyFactory.t.sol";
 
 contract ERC404LegacyFactory_setDeploymentFee is ERC404LegacyFactoryTest {
     function test_RevertsIf_NotOwner() public {

@@ -2,10 +2,10 @@
 pragma solidity >=0.8.23;
 
 import { BaseTest } from "test/Base.t.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
 contract ERC404Test is BaseTest {
-    ERC404ManagedURI public erc404;
+    ERC404LegacyManagedURI public erc404;
 
     string public constant NAME = "name";
     string public constant SYMBOL = "symbol";
@@ -15,6 +15,6 @@ contract ERC404Test is BaseTest {
     function setUp() public virtual override {
         super.setUp();
 
-        erc404 = new ERC404ManagedURI("name", "symbol", BASE_URI, TOTAL_NFT_SUPPLY, users.deployer);
+        erc404 = new ERC404LegacyManagedURI("name", "symbol", BASE_URI, TOTAL_NFT_SUPPLY, users.deployer);
     }
 }

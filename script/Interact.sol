@@ -2,7 +2,7 @@
 pragma solidity >=0.8.23 <0.9.0;
 
 import { BaseScript } from "./Base.s.sol";
-import { ERC404LegacyFactory } from "src/factory/ERC404LegacyFactory.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
 import { console } from "forge-std/src/console.sol";
 
 contract Interact is BaseScript {

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.23;
 
 import { BaseTest } from "test/Base.t.sol";
-import { ERC404LegacyFactory } from "src/factory/ERC404LegacyFactory.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
 
 contract ERC404LegacyFactoryTest is BaseTest {
     ERC404LegacyFactory public factory;

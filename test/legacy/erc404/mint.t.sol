@@ -2,9 +2,9 @@
 pragma solidity >=0.8.23;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
-import { IERC404 } from "src/IERC404.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { ERC404Test } from "./ERC404.t.sol";
+import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
 contract ERC404Test_mint is ERC404Test {
     function setUp() public override {
@@ -24,14 +24,14 @@ contract ERC404Test_mint is ERC404Test {
     function testFuzz_RevertsIf_AmountIsTokenIdOrZero(uint128 amount) public {
         vm.assume(amount <= erc404.minted());
 
-        vm.expectRevert(ERC404ManagedURI.MustBeFractionalizedAmount.selector);
+        vm.expectRevert(ERC404LegacyManagedURI.MustBeFractionalizedAmount.selector);
         erc404.mint(users.deployer, amount);
     }
 
     function testFuzz_RevertsIf_ExceedesTotalSupply(uint128 amount) public {
         vm.assume(amount > erc404.totalSupply() - erc404.currentSupply());
 
-        vm.expectRevert(ERC404ManagedURI.TotalSupplyExceeded.selector);
+        vm.expectRevert(ERC404LegacyManagedURI.TotalSupplyExceeded.selector);
         erc404.mint(users.deployer, amount);
     }
 
@@ -41,7 +41,7 @@ contract ERC404Test_mint is ERC404Test {
         uint256 balanceBefore = erc404.balanceOf(users.deployer);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(address(0), users.deployer, amount);
+        emit IERC404Legacy.ERC20Transfer(address(0), users.deployer, amount);
 
         erc404.mint(users.deployer, amount);
 
@@ -54,7 +54,7 @@ contract ERC404Test_mint is ERC404Test {
         uint256 nextTokenId = erc404.minted() + 1;
 
         vm.expectEmit(address(erc404));
-        emit IERC404.Transfer(address(0), users.deployer, nextTokenId);
+        emit IERC404Legacy.Transfer(address(0), users.deployer, nextTokenId);
 
         erc404.mint(users.deployer, amount);
 
@@ -69,7 +69,7 @@ contract ERC404Test_mint is ERC404Test {
 
         for (uint256 i = 0; i < tokenIdsToMint; i++) {
             vm.expectEmit(address(erc404));
-            emit IERC404.Transfer(address(0), users.deployer, nextTokenId + i);
+            emit IERC404Legacy.Transfer(address(0), users.deployer, nextTokenId + i);
         }
 
         erc404.mint(users.deployer, amount);

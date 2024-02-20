@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
-import { IERC404 } from "src/IERC404.sol";
+import { ERC404Test } from "./ERC404.t.sol";
+import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
 contract ERC404_approve is ERC404Test {
     function setUp() public override {
@@ -16,7 +16,7 @@ contract ERC404_approve is ERC404Test {
         vm.assume(tokenId <= erc404.minted() && tokenId != 0);
         vm.startPrank(users.stranger);
 
-        vm.expectRevert(IERC404.Unauthorized.selector);
+        vm.expectRevert(IERC404Legacy.Unauthorized.selector);
         erc404.approve(users.stranger, tokenId);
     }
 
@@ -26,7 +26,7 @@ contract ERC404_approve is ERC404Test {
         erc404.setApprovalForAll(users.stranger, true);
 
         vm.expectEmit();
-        emit IERC404.Approval(users.deployer, users.stranger, tokenId);
+        emit IERC404Legacy.Approval(users.deployer, users.stranger, tokenId);
 
         vm.startPrank(users.stranger);
         erc404.approve(users.stranger, tokenId);
@@ -38,7 +38,7 @@ contract ERC404_approve is ERC404Test {
         vm.startPrank(users.deployer);
 
         vm.expectEmit();
-        emit IERC404.Approval(users.deployer, users.stranger, tokenId);
+        emit IERC404Legacy.Approval(users.deployer, users.stranger, tokenId);
 
         erc404.approve(users.stranger, tokenId);
         assertEq(erc404.getApproved(tokenId), users.stranger);
@@ -49,7 +49,7 @@ contract ERC404_approve is ERC404Test {
         vm.startPrank(users.deployer);
 
         vm.expectEmit();
-        emit IERC404.Approval(users.deployer, users.stranger, amount);
+        emit IERC404Legacy.Approval(users.deployer, users.stranger, amount);
 
         assertTrue(erc404.approve(users.stranger, amount));
         assertEq(erc404.allowance(users.deployer, users.stranger), amount);
