@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Strings } from "@oz/utils/Strings.sol";
+import { Ownable } from "@oz/access/Ownable.sol";
 import { ERC404Test } from "./ERC404.t.sol";
 import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 

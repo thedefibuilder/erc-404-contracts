@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { ERC165, IERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import { IERC721Receiver } from "@oz/token/ERC721/IERC721Receiver.sol";
+import { IERC20 } from "@oz/token/ERC20/IERC20.sol";
+import { IERC721 } from "@oz/token/ERC721/IERC721.sol";
+import { ERC165, IERC165 } from "@oz/utils/introspection/ERC165.sol";
 import { IERC404Legacy } from "./IERC404Legacy.sol";
 
 abstract contract ERC404Legacy is IERC404Legacy, ERC165 {

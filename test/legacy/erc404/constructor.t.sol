@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.23;
 
-import { IERC20 } from "@openzeppelin/contracts/interfaces/IERC20.sol";
-import { IERC721 } from "@openzeppelin/contracts/interfaces/IERC721.sol";
-import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC165.sol";
+import { IERC20 } from "@oz/interfaces/IERC20.sol";
+import { IERC721 } from "@oz/interfaces/IERC721.sol";
+import { IERC165 } from "@oz/interfaces/IERC165.sol";
 import { ERC404Test } from "./ERC404.t.sol";
 
 contract ERC404Test_constructor is ERC404Test {
