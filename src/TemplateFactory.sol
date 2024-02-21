@@ -37,11 +37,17 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         uint88 deploymentFee;
     }
 
+    struct Deployment {
+        bytes32 templateId;
+        address instance;
+    }
+
     address payable public vault;
-    uint96 internal __gap;
-    mapping(bytes32 id => Template template) internal _templates;
-    mapping(address user => Template[] deployments) internal _deploymentsOf;
-    EnumerableSet.Bytes32Set internal _templateIds;
+    uint96 public totalDeployments;
+
+    mapping(bytes32 id => Template template) private _templates;
+    mapping(address user => Deployment[] deployments) private _deploymentsOf;
+    EnumerableSet.Bytes32Set private _templateIds;
 
     constructor() {
         _disableInitializers();
@@ -53,15 +59,15 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// @notice Sets a template, used both for upserting and deleting templates.
-    function setTemplate(bytes32 templateId, Template calldata template) external onlyOwner {
-        _templates[templateId] = template;
+    function setTemplate(bytes32 id, Template calldata template) external onlyOwner {
+        _templates[id] = template;
         if (template.implementation == address(0)) {
-            _templateIds.remove(templateId);
+            _templateIds.remove(id);
         } else {
-            _templateIds.add(templateId);
+            _templateIds.add(id);
         }
 
-        emit TemplateSet(templateId, template.implementation, template.templateType, template.deploymentFee);
+        emit TemplateSet(id, template.implementation, template.templateType, template.deploymentFee);
     }
 
     /// @notice Sets the vault address.
@@ -79,7 +85,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         if (template.implementation.code.length == 0) revert ImplementationNotFound();
         if (msg.value < template.deploymentFee) revert InsufficientDeploymentFee();
 
-        _deploymentsOf[msg.sender].push(template);
+        totalDeployments++;
 
         if (template.templateType == TemplateType.SimpleContract) {
             instance = _deploySimpleContract(template.implementation, initData);
@@ -88,6 +94,8 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         } else {
             revert TemplateNotSupported();
         }
+
+        _deploymentsOf[msg.sender].push(Deployment(templateId, instance));
         emit TemplateDeployed(templateId, instance, msg.sender);
 
         if (template.deploymentFee > 0) {
@@ -107,7 +115,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// @notice Returns all the deployments of a specific user.
-    function deploymentsOf(address user) external view returns (Template[] memory) {
+    function deploymentsOf(address user) external view returns (Deployment[] memory) {
         return _deploymentsOf[user];
     }
 
