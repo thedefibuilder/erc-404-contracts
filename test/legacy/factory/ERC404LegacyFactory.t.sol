@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { BaseTest } from "test/Base.t.sol";
 import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";

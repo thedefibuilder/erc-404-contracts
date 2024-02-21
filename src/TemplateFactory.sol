@@ -19,7 +19,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     error TemplateNotSupported();
     error InsufficientDeploymentFee();
 
-    event VaultSet(address payable indexed newVault);
+    event VaultSet(address indexed newVault);
     event TemplateSet(bytes32 indexed id, address implementation, TemplateType templateType, uint88 fee);
     event TemplateDeployed(bytes32 indexed id, address indexed instance, address indexed user);
 
@@ -42,7 +42,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         address instance;
     }
 
-    address payable public vault;
+    address public vault;
     uint96 public totalDeployments;
 
     mapping(bytes32 id => Template template) private _templates;
@@ -53,7 +53,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address payable vault_, address admin) external initializer {
+    function initialize(address vault_, address admin) external initializer {
         __Ownable_init(admin);
         _setVault(vault_);
     }
@@ -99,7 +99,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         emit TemplateDeployed(templateId, instance, msg.sender);
 
         if (template.deploymentFee > 0) {
-            vault.sendValue(template.deploymentFee);
+            payable(vault).sendValue(template.deploymentFee);
         }
         // Refund the user if they sent more than the deployment fee.
         if (msg.value > template.deploymentFee) {
@@ -150,7 +150,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         }
     }
 
-    function _setVault(address payable newVault) internal {
+    function _setVault(address newVault) internal {
         vault = newVault;
         emit VaultSet(newVault);
     }

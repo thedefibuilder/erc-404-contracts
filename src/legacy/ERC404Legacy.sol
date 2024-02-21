@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { IERC721Receiver } from "@oz/token/ERC721/IERC721Receiver.sol";
 import { IERC20 } from "@oz/token/ERC20/IERC20.sol";

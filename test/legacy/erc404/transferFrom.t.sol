@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { stdError } from "forge-std/src/StdError.sol";
 import { ERC404Test } from "./ERC404.t.sol";

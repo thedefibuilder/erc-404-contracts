@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { Strings } from "@oz/utils/Strings.sol";
 import { Ownable } from "@oz/access/Ownable.sol";
