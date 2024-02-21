@@ -1,0 +1,6 @@
+@oz=node_modules/@openzeppelin/contracts
+@ozu=node_modules/@openzeppelin/contracts-upgradeable
+@solmate=node_modules/solmate/src
+@ERC404=node_modules/ERC404/contracts
+@prb/test/=node_modules/@prb/test/
+forge-std/=node_modules/forge-std/
