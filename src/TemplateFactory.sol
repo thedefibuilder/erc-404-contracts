@@ -137,9 +137,9 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     {
         bytes memory bytecode = codePointer.read();
         if (constructorArgs.length > 0) {
-            bytecode = abi.encode(bytecode, constructorArgs);
+            bytecode = abi.encodePacked(bytecode, constructorArgs);
         }
-        bytes32 salt = keccak256(abi.encodePacked(msg.sender, block.timestamp));
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, totalDeployments));
         instance = Create2.deploy(0, salt, bytecode);
     }
 
