@@ -71,7 +71,7 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// @notice Sets the vault address.
-    function setVault(address payable newVault) external onlyOwner {
+    function setVault(address newVault) external onlyOwner {
         _setVault(newVault);
     }
 
@@ -82,11 +82,12 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     function deployTemplate(bytes32 templateId, bytes calldata initData) external payable returns (address instance) {
         Template memory template = _templates[templateId];
 
+        // Check
         if (template.implementation.code.length == 0) revert ImplementationNotFound();
         if (msg.value < template.deploymentFee) revert InsufficientDeploymentFee();
 
+        // Effects
         totalDeployments++;
-
         if (template.templateType == TemplateType.SimpleContract) {
             instance = _deploySimpleContract(template.implementation, initData);
         } else if (template.templateType == TemplateType.ProxyClone) {
@@ -94,14 +95,13 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         } else {
             revert TemplateNotSupported();
         }
-
         _deploymentsOf[msg.sender].push(Deployment(templateId, instance));
         emit TemplateDeployed(templateId, instance, msg.sender);
 
+        // Interactions
         if (template.deploymentFee > 0) {
             payable(vault).sendValue(template.deploymentFee);
         }
-        // Refund the user if they sent more than the deployment fee.
         if (msg.value > template.deploymentFee) {
             unchecked {
                 payable(msg.sender).sendValue(msg.value - template.deploymentFee);
