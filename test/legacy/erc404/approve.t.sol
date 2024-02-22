@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.24;
 
-import { ERC404Test } from "./ERC404.t.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
-contract ERC404_approve is ERC404Test {
+contract ERC404_approve is ERC404LegacyTest {
     function setUp() public override {
         super.setUp();
 

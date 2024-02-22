@@ -8,14 +8,13 @@ import { ERC404 } from "@ERC404/ERC404.sol";
 contract ERC404ManagedURI is ERC404, Ownable {
     using Strings for uint256;
 
-    error MustBeFractionalizedAmount();
     error MaxSupplyExceeded();
 
     event MetadataUpdate(uint256 tokenId);
     event BatchMetadataUpdate(uint256 fromTokenId, uint256 toTokenId);
 
     bytes4 private constant ERC4906_INTERFACE_ID = bytes4(0x49064906);
-    uint256 maxSupply;
+    uint256 public immutable maxSupply;
     string public baseURI;
 
     constructor(
@@ -32,8 +31,7 @@ contract ERC404ManagedURI is ERC404, Ownable {
         baseURI = baseURI_;
     }
 
-    function mint(address to, uint128 erc20Amount) external onlyOwner {
-        if (erc20Amount <= minted) revert MustBeFractionalizedAmount();
+    function mint(address to, uint256 erc20Amount) external onlyOwner {
         if (erc20Amount > maxSupply - totalSupply) revert MaxSupplyExceeded();
 
         _mintERC20(to, erc20Amount);

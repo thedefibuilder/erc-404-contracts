@@ -2,10 +2,10 @@
 pragma solidity 0.8.24;
 
 import { stdError } from "forge-std/src/StdError.sol";
-import { ERC404Test } from "./ERC404.t.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
-contract ERC404Test_transferFrom is ERC404Test {
+contract ERC404LegacyTest_transferFrom is ERC404LegacyTest {
     function setUp() public override {
         super.setUp();
 

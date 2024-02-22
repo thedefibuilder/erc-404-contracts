@@ -3,10 +3,10 @@ pragma solidity 0.8.24;
 
 import { Strings } from "@oz/utils/Strings.sol";
 import { Ownable } from "@oz/access/Ownable.sol";
-import { ERC404Test } from "./ERC404.t.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
-contract ERC404Test_setBaseURI is ERC404Test {
+contract ERC404LegacyTest_setBaseURI is ERC404LegacyTest {
     using Strings for uint256;
 
     function setUp() public override {

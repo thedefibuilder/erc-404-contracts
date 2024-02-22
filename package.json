@@ -9,9 +9,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
     "@openzeppelin/contracts-upgradeable": "^5.0.1",
-    "solmate": "^6.2.0"
-  },
-  "devDependencies": {
+    "solmate": "^6.2.0",
     "@prb/test": "^0.6.4",
     "ERC404": "github:Pandora-Labs-Org/erc404",
     "forge-std": "github:foundry-rs/forge-std#v1.7.5",

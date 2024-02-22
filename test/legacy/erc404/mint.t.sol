@@ -2,11 +2,11 @@
 pragma solidity 0.8.24;
 
 import { Ownable } from "@oz/access/Ownable.sol";
-import { ERC404Test } from "./ERC404.t.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
-contract ERC404Test_mint is ERC404Test {
+contract ERC404LegacyTest_mint is ERC404LegacyTest {
     function setUp() public override {
         super.setUp();
 

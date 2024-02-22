@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.24;
 
-import { ERC404Test } from "./ERC404.t.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 import { MockERC721Receiver, ERC721Holder } from "test/mocks/ERC721Receiver.t.sol";
 import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
-contract ERC404Test_safeTransferFrom is ERC404Test {
+contract ERC404LegacyTest_safeTransferFrom is ERC404LegacyTest {
     MockERC721Receiver public mockReceiver;
 
     function setUp() public override {

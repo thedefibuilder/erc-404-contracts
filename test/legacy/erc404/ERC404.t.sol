@@ -4,7 +4,7 @@ pragma solidity 0.8.24;
 import { BaseTest } from "test/Base.t.sol";
 import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
-contract ERC404Test is BaseTest {
+abstract contract ERC404LegacyTest is BaseTest {
     ERC404LegacyManagedURI public erc404;
 
     string public constant NAME = "name";
