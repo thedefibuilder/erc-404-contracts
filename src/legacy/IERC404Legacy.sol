@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { IERC165 } from "@oz/utils/introspection/IERC165.sol";
 
-interface IERC404 is IERC165 {
+interface IERC404Legacy is IERC165 {
     // Events
     event ERC20Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);

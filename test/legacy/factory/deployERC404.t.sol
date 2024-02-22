@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { FactoryTest } from "test/factory/Factory.t.sol";
-import { Factory } from "src/factory/Factory.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { ERC404LegacyFactoryTest } from "./ERC404LegacyFactory.t.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
-contract Factory_deployERC404 is FactoryTest {
+contract ERC404LegacyFactory_deployERC404 is ERC404LegacyFactoryTest {
     function testFuzz_RevertsIf_DeploymentFeeNotEqual(uint128 deploymentFee) public {
         vm.assume(deploymentFee < factory.deploymentFee());
 
-        vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
+        vm.expectRevert(ERC404LegacyFactory.InsufficientDeploymentFee.selector);
         factory.deployERC404{ value: deploymentFee }("name", "symbol", "baseURI", 1);
     }
 
     function test_DuringFreePeriod_DeploymentIsFree() public {
-        Factory.FreePeriod memory freePeriod =
-            Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
+        ERC404LegacyFactory.FreePeriod memory freePeriod =
+            ERC404LegacyFactory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
         vm.startPrank(users.admin);
         factory.setFreePeriod(freePeriod);
 
         vm.expectEmit(true, false, false, false);
-        emit Factory.ERC404Deployed(users.stranger, address(0));
+        emit ERC404LegacyFactory.ERC404Deployed(users.stranger, address(0));
 
         vm.startPrank(users.stranger);
         address erc404 = factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
@@ -30,8 +30,8 @@ contract Factory_deployERC404 is FactoryTest {
     }
 
     function test_DuringFreePeriod_NotFreeIfAlreadyDeployed() public {
-        Factory.FreePeriod memory freePeriod =
-            Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
+        ERC404LegacyFactory.FreePeriod memory freePeriod =
+            ERC404LegacyFactory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
         vm.startPrank(users.admin);
         factory.setFreePeriod(freePeriod);
 
@@ -39,19 +39,19 @@ contract Factory_deployERC404 is FactoryTest {
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
 
         assertNotEq(factory.deploymentFeeForUser(users.stranger), 0);
-        vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
+        vm.expectRevert(ERC404LegacyFactory.InsufficientDeploymentFee.selector);
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
     }
 
     function test_AfterFreePeriod_DeploymentIsNotFree() public {
-        Factory.FreePeriod memory freePeriod =
-            Factory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
+        ERC404LegacyFactory.FreePeriod memory freePeriod =
+            ERC404LegacyFactory.FreePeriod({ start: uint64(block.timestamp), end: uint64(block.timestamp + 1 days) });
         vm.startPrank(users.admin);
         factory.setFreePeriod(freePeriod);
 
         skip(1 days);
 
-        vm.expectRevert(Factory.InsufficientDeploymentFee.selector);
+        vm.expectRevert(ERC404LegacyFactory.InsufficientDeploymentFee.selector);
         factory.deployERC404{ value: 0 }("name", "symbol", "baseURI", 1);
     }
 
@@ -61,7 +61,7 @@ contract Factory_deployERC404 is FactoryTest {
         uint256 deployerBalanceBefore = address(users.deployer).balance;
 
         vm.expectEmit(true, false, false, false);
-        emit Factory.ERC404Deployed(users.deployer, address(0));
+        emit ERC404LegacyFactory.ERC404Deployed(users.deployer, address(0));
 
         factory.deployERC404{ value: initialDeploymentFee + 1e10 }("name", "symbol", "baseURI", 1);
 
@@ -74,7 +74,7 @@ contract Factory_deployERC404 is FactoryTest {
         uint256 vaultBalanceBefore = address(factory.vault()).balance;
 
         vm.expectEmit(true, false, false, false);
-        emit Factory.ERC404Deployed(users.stranger, address(0));
+        emit ERC404LegacyFactory.ERC404Deployed(users.stranger, address(0));
 
         address erc404 = factory.deployERC404{ value: initialDeploymentFee }("name", "symbol", "baseURI", 1);
 
@@ -82,8 +82,8 @@ contract Factory_deployERC404 is FactoryTest {
         assertEq(factory.deploymentsOf(users.stranger)[0], erc404);
         assertEq(address(factory.vault()).balance, vaultBalanceBefore + initialDeploymentFee);
 
-        // Assert that ERC404ManagedURI was deployed
-        address otherERC404 = address(new ERC404ManagedURI("name", "symbol", "baseURI", 1, users.stranger));
+        // Assert that ERC404LegacyManagedURI was deployed
+        address otherERC404 = address(new ERC404LegacyManagedURI("name", "symbol", "baseURI", 1, users.stranger));
         assertEq(erc404.codehash, otherERC404.codehash);
     }
 }

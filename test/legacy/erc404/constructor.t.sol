@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { IERC20 } from "@openzeppelin/contracts/interfaces/IERC20.sol";
-import { IERC721 } from "@openzeppelin/contracts/interfaces/IERC721.sol";
-import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC165.sol";
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
+import { IERC20 } from "@oz/interfaces/IERC20.sol";
+import { IERC721 } from "@oz/interfaces/IERC721.sol";
+import { IERC165 } from "@oz/interfaces/IERC165.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
 
-contract ERC404Test_constructor is ERC404Test {
+contract ERC404LegacyTest_constructor is ERC404LegacyTest {
     function test_constructor() public {
         assertEq(erc404.name(), NAME);
         assertEq(erc404.symbol(), SYMBOL);

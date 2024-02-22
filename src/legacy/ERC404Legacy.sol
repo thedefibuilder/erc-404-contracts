@@ -1,39 +1,39 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { ERC165, IERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import { IERC404 } from "./IERC404.sol";
+import { IERC721Receiver } from "@oz/token/ERC721/IERC721Receiver.sol";
+import { IERC20 } from "@oz/token/ERC20/IERC20.sol";
+import { IERC721 } from "@oz/token/ERC721/IERC721.sol";
+import { ERC165, IERC165 } from "@oz/utils/introspection/ERC165.sol";
+import { IERC404Legacy } from "./IERC404Legacy.sol";
 
-abstract contract ERC404 is IERC404, ERC165 {
-    /// @inheritdoc IERC404
+abstract contract ERC404Legacy is IERC404Legacy, ERC165 {
+    /// @inheritdoc IERC404Legacy
     string public name;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     string public symbol;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     uint8 public immutable decimals;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     uint256 public immutable totalSupply;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     uint128 public minted;
     uint128 public currentSupply;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     mapping(address user => uint256 balance) public balanceOf;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     mapping(address owner => mapping(address operator => uint256 amount)) public allowance;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     mapping(uint256 tokenId => address operator) public getApproved;
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     mapping(address owner => mapping(address operator => bool isApproved)) public isApprovedForAll;
 
     // ---------------------- Internals ---------------------- //
@@ -57,12 +57,12 @@ abstract contract ERC404 is IERC404, ERC165 {
         totalSupply = totalNFTSupply_ * _UNIT;
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function ownerOf(uint256 id) public view virtual returns (address owner) {
         return _ownerOf[id];
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function approve(address spender, uint256 amountOrId) public virtual returns (bool) {
         if (amountOrId <= minted && amountOrId > 0) {
             address owner = _ownerOf[amountOrId];
@@ -83,14 +83,14 @@ abstract contract ERC404 is IERC404, ERC165 {
         return true;
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function setApprovalForAll(address operator, bool approved) public virtual {
         isApprovedForAll[msg.sender][operator] = approved;
 
         emit ApprovalForAll(msg.sender, operator, approved);
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function transferFrom(address from, address to, uint256 amountOrId) public virtual {
         if (amountOrId <= minted) {
             if (from != _ownerOf[amountOrId]) revert InvalidSender();
@@ -131,17 +131,17 @@ abstract contract ERC404 is IERC404, ERC165 {
         }
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function transfer(address to, uint256 amount) public virtual returns (bool) {
         return _transfer(msg.sender, to, amount);
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function safeTransferFrom(address from, address to, uint256 id) public virtual {
         safeTransferFrom(from, to, id, bytes(""));
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function safeTransferFrom(address from, address to, uint256 id, bytes memory data) public virtual {
         transferFrom(from, to, id);
 
@@ -160,7 +160,7 @@ abstract contract ERC404 is IERC404, ERC165 {
             || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IERC404
+    /// @inheritdoc IERC404Legacy
     function tokenURI(uint256 id) public view virtual returns (string memory);
 
     // ---------------------- Internal functions ---------------------- //

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
-import { ERC404ManagedURI } from "src/extensions/ERC404ManagedURI.sol";
+import { Strings } from "@oz/utils/Strings.sol";
+import { Ownable } from "@oz/access/Ownable.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
+import { ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyManagedURI.sol";
 
-contract ERC404Test_setBaseURI is ERC404Test {
+contract ERC404LegacyTest_setBaseURI is ERC404LegacyTest {
     using Strings for uint256;
 
     function setUp() public override {
@@ -37,7 +37,7 @@ contract ERC404Test_setBaseURI is ERC404Test {
         uint256 minted = erc404.minted();
 
         vm.expectEmit(address(erc404));
-        emit ERC404ManagedURI.BatchMetadataUpdate(1, minted);
+        emit ERC404LegacyManagedURI.BatchMetadataUpdate(1, minted);
 
         erc404.setBaseURI(BASE_URI);
     }

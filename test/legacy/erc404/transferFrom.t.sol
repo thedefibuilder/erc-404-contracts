@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { stdError } from "forge-std/src/StdError.sol";
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
-import { IERC404 } from "src/IERC404.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
+import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
-contract ERC404Test_transferFrom is ERC404Test {
+contract ERC404LegacyTest_transferFrom is ERC404LegacyTest {
     function setUp() public override {
         super.setUp();
 
@@ -15,13 +15,13 @@ contract ERC404Test_transferFrom is ERC404Test {
 
     function testFuzz_WhenERC721_RevertsIf_TokenIdIsNotOwnedBySender(uint256 tokenId) public {
         vm.assume(tokenId <= erc404.minted());
-        vm.expectRevert(IERC404.InvalidSender.selector);
+        vm.expectRevert(IERC404Legacy.InvalidSender.selector);
         erc404.transferFrom(users.stranger, users.deployer, tokenId);
     }
 
     function testFuzz_WhenERC721_RevertsIf_RecipientIsZeroAddress(uint256 tokenId) public {
         vm.assume(tokenId <= erc404.minted() && tokenId > 0);
-        vm.expectRevert(IERC404.InvalidRecipient.selector);
+        vm.expectRevert(IERC404Legacy.InvalidRecipient.selector);
         erc404.transferFrom(users.deployer, address(0), tokenId);
     }
 
@@ -29,7 +29,7 @@ contract ERC404Test_transferFrom is ERC404Test {
         vm.assume(tokenId <= erc404.minted() && tokenId > 0);
         vm.startPrank(users.stranger);
 
-        vm.expectRevert(IERC404.Unauthorized.selector);
+        vm.expectRevert(IERC404Legacy.Unauthorized.selector);
         erc404.transferFrom(users.deployer, users.stranger, tokenId);
     }
 
@@ -39,10 +39,10 @@ contract ERC404Test_transferFrom is ERC404Test {
         erc404.setApprovalForAll(users.stranger, true);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.Transfer(users.deployer, users.stranger, tokenId);
+        emit IERC404Legacy.Transfer(users.deployer, users.stranger, tokenId);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(users.deployer, users.stranger, 1e18);
+        emit IERC404Legacy.ERC20Transfer(users.deployer, users.stranger, 1e18);
 
         vm.startPrank(users.stranger);
         erc404.transferFrom(users.deployer, users.stranger, tokenId);
@@ -58,10 +58,10 @@ contract ERC404Test_transferFrom is ERC404Test {
         erc404.approve(users.stranger, tokenId);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.Transfer(users.deployer, users.stranger, tokenId);
+        emit IERC404Legacy.Transfer(users.deployer, users.stranger, tokenId);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(users.deployer, users.stranger, 1e18);
+        emit IERC404Legacy.ERC20Transfer(users.deployer, users.stranger, 1e18);
 
         vm.startPrank(users.stranger);
         erc404.transferFrom(users.deployer, users.stranger, tokenId);
@@ -77,10 +77,10 @@ contract ERC404Test_transferFrom is ERC404Test {
         uint256 balanceSenderBefore = erc404.balanceOf(users.deployer);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.Transfer(users.deployer, users.stranger, tokenId);
+        emit IERC404Legacy.Transfer(users.deployer, users.stranger, tokenId);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(users.deployer, users.stranger, 1e18);
+        emit IERC404Legacy.ERC20Transfer(users.deployer, users.stranger, 1e18);
 
         erc404.transferFrom(users.deployer, users.stranger, tokenId);
 
@@ -104,7 +104,7 @@ contract ERC404Test_transferFrom is ERC404Test {
         erc404.approve(users.stranger, amount);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(users.deployer, users.stranger, amount);
+        emit IERC404Legacy.ERC20Transfer(users.deployer, users.stranger, amount);
 
         vm.startPrank(users.stranger);
         erc404.transferFrom(users.deployer, users.stranger, amount);

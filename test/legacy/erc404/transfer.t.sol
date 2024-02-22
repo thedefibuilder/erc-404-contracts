@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
 import { stdError } from "forge-std/src/StdError.sol";
-import { ERC404Test } from "test/erc404/ERC404.t.sol";
-import { IERC404 } from "src/IERC404.sol";
+import { ERC404LegacyTest } from "./ERC404.t.sol";
+import { IERC404Legacy } from "src/legacy/IERC404Legacy.sol";
 
-contract ERC404Test_transfer is ERC404Test {
+contract ERC404LegacyTest_transfer is ERC404LegacyTest {
     function setUp() public override {
         super.setUp();
 
@@ -24,7 +24,7 @@ contract ERC404Test_transfer is ERC404Test {
         uint256 strangerBalance = erc404.balanceOf(users.stranger);
 
         vm.expectEmit(address(erc404));
-        emit IERC404.ERC20Transfer(users.deployer, users.stranger, amount);
+        emit IERC404Legacy.ERC20Transfer(users.deployer, users.stranger, amount);
 
         erc404.transfer(users.stranger, amount);
 
@@ -40,7 +40,7 @@ contract ERC404Test_transfer is ERC404Test {
 
         for (uint256 i = 0; i < nftsToBurn; i++) {
             vm.expectEmit(address(erc404));
-            emit IERC404.Transfer(users.deployer, address(0), lastTokenId - i);
+            emit IERC404Legacy.Transfer(users.deployer, address(0), lastTokenId - i);
         }
 
         erc404.transfer(users.stranger, amount);
@@ -58,7 +58,7 @@ contract ERC404Test_transfer is ERC404Test {
 
         for (uint256 i = 0; i < nftsToMint; i++) {
             vm.expectEmit(address(erc404));
-            emit IERC404.Transfer(address(0), users.stranger, nextTokenId + i);
+            emit IERC404Legacy.Transfer(address(0), users.stranger, nextTokenId + i);
         }
 
         erc404.transfer(users.stranger, amount);

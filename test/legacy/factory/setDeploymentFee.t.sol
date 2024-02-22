@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.23;
+pragma solidity 0.8.24;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { Factory } from "src/factory/Factory.sol";
-import { FactoryTest } from "test/factory/Factory.t.sol";
+import { Ownable } from "@oz/access/Ownable.sol";
+import { ERC404LegacyFactory } from "src/legacy/ERC404LegacyFactory.sol";
+import { ERC404LegacyFactoryTest } from "./ERC404LegacyFactory.t.sol";
 
-contract Factory_setDeploymentFee is FactoryTest {
+contract ERC404LegacyFactory_setDeploymentFee is ERC404LegacyFactoryTest {
     function test_RevertsIf_NotOwner() public {
         vm.startPrank(users.stranger);
 
@@ -17,7 +17,7 @@ contract Factory_setDeploymentFee is FactoryTest {
         uint128 newDeploymentFee = 0.2e18;
 
         vm.expectEmit(address(factory));
-        emit Factory.DeploymentFeeChanged(factory.deploymentFee(), newDeploymentFee);
+        emit ERC404LegacyFactory.DeploymentFeeChanged(factory.deploymentFee(), newDeploymentFee);
 
         vm.startPrank(users.admin);
         factory.setDeploymentFee(newDeploymentFee);
