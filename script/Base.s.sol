@@ -6,7 +6,16 @@ import { Script } from "forge-std/src/Script.sol";
 abstract contract BaseScript is Script {
     address internal broadcaster;
 
-    constructor() {
+    struct ChainConfig {
+        uint256 deploymentFee;
+        address vault;
+        address admin;
+    }
+
+    mapping(uint256 chainId => ChainConfig config) public chainConfigs;
+    ChainConfig public currentChainConfig;
+
+    function setUp() public {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         broadcaster = vm.rememberKey(privateKey);
     }

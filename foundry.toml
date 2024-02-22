@@ -20,16 +20,15 @@ fuzz = { runs = 10_000 }
 verbosity = 4
 
 [etherscan]
-sepolia = { key = "${API_KEY_ETHERSCAN}" }
 arbitrum = { key = "${API_KEY_ARBISCAN}" }
-# avalanche = { key = "${API_KEY_SNOWTRACE}" }
+arbitrum_sepolia = { key = "${API_KEY_ARBISCAN}" }
 bsc = { key = "${API_KEY_BSCSCAN}" }
-# gnosis_chain = { key = "${API_KEY_GNOSISSCAN}" }
-goerli = { key = "${API_KEY_ETHERSCAN}" }
-mainnet = { key = "${API_KEY_ETHERSCAN}" }
-# optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
+bsc_testnet = { key = "${API_KEY_BSCSCAN}" }
 polygon = { key = "${API_KEY_POLYGONSCAN}" }
+polygon_mumbai = { key = "${API_KEY_POLYGONSCAN}" }
 linea = { key = "${API_KEY_LINEASCAN}" }
+linea_goerli = { key = "${API_KEY_LINEASCAN}" }
+
 
 [fmt]
 bracket_spacing = true
@@ -42,18 +41,12 @@ tab_width = 4
 wrap_comments = true
 
 [rpc_endpoints]
-arbitrum = "https://arbitrum-mainnet.infura.io/v3/${API_KEY_INFURA}"
-avalanche = "https://avalanche-mainnet.infura.io/v3/${API_KEY_INFURA}"
-bsc = "https://bsc-dataseed.binance.org"
-gnosis_chain = "https://rpc.gnosischain.com"
-goerli = "https://goerli.infura.io/v3/${API_KEY_INFURA}"
 localhost = "http://localhost:8545"
-mainnet = "https://eth-mainnet.g.alchemy.com/v2/${API_KEY_ALCHEMY}"
-optimism = "https://optimism-mainnet.infura.io/v3/${API_KEY_INFURA}"
-polygon = "https://polygon-mainnet.infura.io/v3/${API_KEY_INFURA}"
-sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
-linea = "https://linea-mainnet.infura.io/v3/${API_KEY_INFURA}"
-bsc_testnet = "https://bsc-testnet.public.blastapi.io"
-linea_goerli = "https://linea-goerli.infura.io/v3/${API_KEY_INFURA}"
+arbitrum = "https://arbitrum-mainnet.infura.io/v3/${API_KEY_INFURA}"
 arbitrum_sepolia = "https://arbitrum-sepolia.infura.io/v3/${API_KEY_INFURA}"
+bsc = "https://bsc-dataseed.binance.org"
+bsc_testnet = "https://bsc-testnet.public.blastapi.io"
+polygon = "https://polygon-mainnet.infura.io/v3/${API_KEY_INFURA}"
 polygon_mumbai = "https://polygon-mumbai.infura.io/v3/${API_KEY_INFURA}"
+linea = "https://linea-mainnet.infura.io/v3/${API_KEY_INFURA}"
+linea_goerli = "https://linea-goerli.infura.io/v3/${API_KEY_INFURA}"
