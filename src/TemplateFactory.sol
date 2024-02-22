@@ -8,6 +8,7 @@ import { Create2 } from "@oz/utils/Create2.sol";
 import { Address } from "@oz/utils/Address.sol";
 import { EnumerableSet } from "@oz/utils/structs/EnumerableSet.sol";
 import { SSTORE2 } from "@solmate/utils/SSTORE2.sol";
+import { Template, TemplateType } from "src/types/Template.sol";
 
 contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     using Address for *;
@@ -22,20 +23,6 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     event VaultSet(address indexed newVault);
     event TemplateSet(bytes32 indexed id, address implementation, TemplateType templateType, uint88 fee);
     event TemplateDeployed(bytes32 indexed id, address indexed instance, address indexed user);
-
-    /// @notice Types of templates. More can be added.
-    /// 1. Simple Contract, address stores creation code using SSTORE2.
-    /// 2. Proxy, address stores implementation.
-    enum TemplateType {
-        SimpleContract,
-        ProxyClone
-    }
-
-    struct Template {
-        address implementation;
-        TemplateType templateType;
-        uint88 deploymentFee;
-    }
 
     struct Deployment {
         bytes32 templateId;
@@ -59,15 +46,17 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// @notice Sets a template, used both for upserting and deleting templates.
-    function setTemplate(bytes32 id, Template calldata template) external onlyOwner {
+    function setTemplate(bytes32 id, Template template) external onlyOwner {
+        (address implementation, TemplateType templateType, uint88 deploymentFee) = template.unwrap();
+
         _templates[id] = template;
-        if (template.implementation == address(0)) {
+        if (implementation == address(0)) {
             _templateIds.remove(id);
         } else {
             _templateIds.add(id);
         }
 
-        emit TemplateSet(id, template.implementation, template.templateType, template.deploymentFee);
+        emit TemplateSet(id, implementation, templateType, deploymentFee);
     }
 
     /// @notice Sets the vault address.
@@ -80,18 +69,19 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     /// @param initData The data to be used in the initializer/constructor of deployed contract.
     /// @dev For proxy clones, initData should include selector.
     function deployTemplate(bytes32 templateId, bytes calldata initData) external payable returns (address instance) {
-        Template memory template = _templates[templateId];
+        Template template = _templates[templateId];
+        (address implementation, TemplateType templateType, uint88 deploymentFee) = template.unwrap();
 
         // Check
-        if (template.implementation.code.length == 0) revert ImplementationNotFound();
-        if (msg.value < template.deploymentFee) revert InsufficientDeploymentFee();
+        if (implementation.code.length == 0) revert ImplementationNotFound();
+        if (msg.value < deploymentFee) revert InsufficientDeploymentFee();
 
         // Effects
         totalDeployments++;
-        if (template.templateType == TemplateType.SimpleContract) {
-            instance = _deploySimpleContract(template.implementation, initData);
-        } else if (template.templateType == TemplateType.ProxyClone) {
-            instance = _deployProxyClone(template.implementation, initData);
+        if (templateType == TemplateType.SimpleContract) {
+            instance = _deploySimpleContract(implementation, initData);
+        } else if (templateType == TemplateType.ProxyClone) {
+            instance = _deployProxyClone(implementation, initData);
         } else {
             revert TemplateNotSupported();
         }
@@ -99,19 +89,23 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         emit TemplateDeployed(templateId, instance, msg.sender);
 
         // Interactions
-        if (template.deploymentFee > 0) {
-            payable(vault).sendValue(template.deploymentFee);
+        if (deploymentFee > 0) {
+            payable(vault).sendValue(deploymentFee);
         }
-        if (msg.value > template.deploymentFee) {
+        if (msg.value > deploymentFee) {
             unchecked {
-                payable(msg.sender).sendValue(msg.value - template.deploymentFee);
+                payable(msg.sender).sendValue(msg.value - deploymentFee);
             }
         }
     }
 
     /// @notice Returns the template data given a specific id.
-    function getTemplate(bytes32 templateId) external view returns (Template memory) {
-        return _templates[templateId];
+    function getTemplate(bytes32 templateId)
+        external
+        view
+        returns (address implementation, TemplateType templateType, uint88 deploymentFee)
+    {
+        return _templates[templateId].unwrap();
     }
 
     /// @notice Returns all the deployments of a specific user.

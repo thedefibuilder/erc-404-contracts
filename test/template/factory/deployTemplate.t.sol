@@ -5,6 +5,7 @@ import { Deployments } from "script/DeploymentsLib.sol";
 import { TemplateFactory } from "src/TemplateFactory.sol";
 import { MockSimpleContractTemplate } from "test/mocks/SimpleContractTemplate.t.sol";
 import { MockProxyCloneTemplate } from "test/mocks/ProxyCloneTemplate.t.sol";
+import { toTemplate, TemplateType, Template } from "src/types/Template.sol";
 import { TemplateFactoryTest } from "./TemplateFactory.t.sol";
 
 contract TemplateFactory_deployTemplate is TemplateFactoryTest {
@@ -13,30 +14,21 @@ contract TemplateFactory_deployTemplate is TemplateFactoryTest {
     bytes32 public contractTemplateId = bytes32(uint256(1));
     bytes32 public proxyTemplateId = bytes32(uint256(2));
     bytes32 public invalidTemplateId = bytes32(uint256(3));
-    TemplateFactory.Template public contractTemplate;
-    TemplateFactory.Template public proxyTemplate;
-    TemplateFactory.Template public invalidTemplate;
+    Template public contractTemplate;
+    Template public proxyTemplate;
+    Template public invalidTemplate;
 
     function setUp() public override {
         super.setUp();
 
-        contractTemplate = TemplateFactory.Template({
-            implementation: Deployments.deployCodePointer(type(MockSimpleContractTemplate).creationCode),
-            templateType: TemplateFactory.TemplateType.SimpleContract,
-            deploymentFee: deploymentFee
-        });
+        contractTemplate = toTemplate(
+            Deployments.deployCodePointer(type(MockSimpleContractTemplate).creationCode),
+            TemplateType.SimpleContract,
+            deploymentFee
+        );
 
-        proxyTemplate = TemplateFactory.Template({
-            implementation: address(new MockProxyCloneTemplate()),
-            templateType: TemplateFactory.TemplateType.ProxyClone,
-            deploymentFee: deploymentFee
-        });
-
-        invalidTemplate = TemplateFactory.Template({
-            implementation: address(0),
-            templateType: TemplateFactory.TemplateType.SimpleContract,
-            deploymentFee: deploymentFee
-        });
+        proxyTemplate = toTemplate(address(new MockProxyCloneTemplate()), TemplateType.ProxyClone, deploymentFee);
+        invalidTemplate = toTemplate(address(0), TemplateType.SimpleContract, deploymentFee);
 
         vm.startPrank(users.admin);
         factory.setTemplate(contractTemplateId, contractTemplate);

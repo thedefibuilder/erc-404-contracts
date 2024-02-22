@@ -4,19 +4,12 @@ pragma solidity 0.8.24;
 import { Ownable } from "@oz/access/Ownable.sol";
 import { TemplateFactory } from "src/TemplateFactory.sol";
 import { TemplateFactoryTest } from "./TemplateFactory.t.sol";
+import { toTemplate, TemplateType, Template } from "src/types/Template.sol";
 
 contract TemplateFactory_setTemplate is TemplateFactoryTest {
     bytes32 public templateId = bytes32(uint256(1));
-    TemplateFactory.Template public removalTemplate = TemplateFactory.Template({
-        implementation: address(0),
-        templateType: TemplateFactory.TemplateType.SimpleContract,
-        deploymentFee: 0
-    });
-    TemplateFactory.Template public template = TemplateFactory.Template({
-        implementation: address(1),
-        templateType: TemplateFactory.TemplateType.SimpleContract,
-        deploymentFee: 0
-    });
+    Template public removalTemplate = toTemplate(address(0), TemplateType.SimpleContract, 0);
+    Template public template = toTemplate(address(1), TemplateType.SimpleContract, 0);
 
     function test_RevertsIf_Unauthorized() public {
         vm.startPrank(users.stranger);
@@ -30,14 +23,15 @@ contract TemplateFactory_setTemplate is TemplateFactoryTest {
 
         vm.expectEmit(address(factory));
         emit TemplateFactory.TemplateSet(
-            templateId, template.implementation, template.templateType, template.deploymentFee
+            templateId, template.implementation(), template.templateType(), template.deploymentFee()
         );
 
         factory.setTemplate(templateId, template);
 
-        assertEq(factory.getTemplate(templateId).deploymentFee, template.deploymentFee);
-        assertEq(factory.getTemplate(templateId).implementation, template.implementation);
-        assertTrue(factory.getTemplate(templateId).templateType == template.templateType);
+        (address implementation, TemplateType templateType, uint88 deploymentFee) = factory.getTemplate(templateId);
+        assertEq(deploymentFee, template.deploymentFee());
+        assertEq(implementation, template.implementation());
+        assertTrue(templateType == template.templateType());
         assertContains(factory.templateIds(), templateId);
     }
 
@@ -47,7 +41,10 @@ contract TemplateFactory_setTemplate is TemplateFactoryTest {
 
         vm.expectEmit(address(factory));
         emit TemplateFactory.TemplateSet(
-            templateId, removalTemplate.implementation, removalTemplate.templateType, removalTemplate.deploymentFee
+            templateId,
+            removalTemplate.implementation(),
+            removalTemplate.templateType(),
+            removalTemplate.deploymentFee()
         );
 
         factory.setTemplate(templateId, removalTemplate);

@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import { Deployments } from "script/DeploymentsLib.sol";
 import { ERC404ManagedURI } from "src/templates/ERC404ManagedURI.sol";
-import { TemplateFactory } from "src/TemplateFactory.sol";
+import { toTemplate, TemplateType, Template } from "src/types/Template.sol";
 import { TemplateFactoryTest } from "test/template/factory/TemplateFactory.t.sol";
 
 abstract contract ERC404ManagedURITest is TemplateFactoryTest {
@@ -20,11 +20,7 @@ abstract contract ERC404ManagedURITest is TemplateFactoryTest {
         address erc404CodePointer = Deployments.deployCodePointer(type(ERC404ManagedURI).creationCode);
         bytes32 erc404TemplateId = bytes32(uint256(1));
 
-        TemplateFactory.Template memory erc404Template = TemplateFactory.Template({
-            implementation: erc404CodePointer,
-            templateType: TemplateFactory.TemplateType.SimpleContract,
-            deploymentFee: 0
-        });
+        Template erc404Template = toTemplate(erc404CodePointer, TemplateType.SimpleContract, 0);
 
         vm.startPrank(users.admin);
         factory.setTemplate(erc404TemplateId, erc404Template);
