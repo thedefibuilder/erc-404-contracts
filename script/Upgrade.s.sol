@@ -10,25 +10,23 @@ import { TemplateFactory } from "src/TemplateFactory.sol";
 import { ERC404ManagedURI } from "src/templates/ERC404ManagedURI.sol";
 import { toTemplate, TemplateType, Template } from "src/types/Template.sol";
 
-contract Deploy is BaseScript {
+contract Upgrade is BaseScript {
     using ShortStrings for *;
     using SafeCast for uint256;
 
     TemplateFactory public factory;
 
     function run() public broadcast {
-        factory = Deployments.deployTemplateFactory(config.vault, config.admin, config.legacyFactory);
+        factory = TemplateFactory(config.templateFactory);
 
-        Template erc404Template = toTemplate(
-            Deployments.deployCodePointer(type(ERC404ManagedURI).creationCode),
-            TemplateType.SimpleContract,
-            config.deploymentFee.toUint88()
-        );
+        TemplateFactory newVersion =
+            new TemplateFactory(config.legacyFactory, ShortString.unwrap("ERC404Legacy".toShortString()));
+
         Template legacyTemplate = toTemplate(config.legacyFactory, TemplateType.LegacyFactory, 0);
 
-        factory.setTemplate(ShortString.unwrap("ERC404Optimized".toShortString()), erc404Template);
+        factory.upgradeToAndCall(address(newVersion), "");
         factory.setTemplate(factory.LEGACY_TEMPLATE_ID(), legacyTemplate);
 
-        console.log("Deployed TemplateFactory at", address(factory));
+        assert(address(factory.LEGACY_FACTORY()) == config.legacyFactory);
     }
 }

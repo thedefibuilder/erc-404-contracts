@@ -7,17 +7,31 @@ abstract contract BaseScript is Script {
     address internal broadcaster;
 
     struct ChainConfig {
-        uint256 deploymentFee;
-        address vault;
         address admin;
+        uint256 chainId;
+        uint256 deploymentFee;
+        address legacyFactory;
+        address templateFactory;
+        address vault;
     }
 
-    mapping(uint256 chainId => ChainConfig config) public chainConfigs;
-    ChainConfig public currentChainConfig;
+    ChainConfig public config;
 
-    function setUp() public {
+    function setUp() public virtual {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         broadcaster = vm.rememberKey(privateKey);
+
+        string memory json = vm.readFile("script/config.json");
+        ChainConfig[] memory configs = abi.decode(vm.parseJson(json), (ChainConfig[]));
+        for (uint256 i = 0; i < configs.length; i++) {
+            if (block.chainid == configs[i].chainId) {
+                config = configs[i];
+                break;
+            }
+        }
+
+        // solhint-disable-next-line custom-errors
+        require(config.chainId != 0, "Chain config not found");
     }
 
     modifier broadcast() {
