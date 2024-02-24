@@ -8,12 +8,13 @@ import { TemplateFactory } from "src/TemplateFactory.sol";
 
 abstract contract TemplateFactoryTest is BaseTest {
     TemplateFactory public factory;
+    ERC404LegacyFactory public legacyFactory;
 
     function setUp() public virtual override {
         super.setUp();
 
-        ERC404LegacyFactory legacyFactory =
-            new ERC404LegacyFactory(users.admin, 0.01e18, users.vault, ERC404LegacyFactory.FreePeriod(0, 0));
+        // Intentionally inversed admin and vault for legacy factory constructor.
+        legacyFactory = new ERC404LegacyFactory(users.admin, 0.1e18, users.vault, ERC404LegacyFactory.FreePeriod(0, 0));
         factory = Deployments.deployTemplateFactory(users.vault, users.admin, address(legacyFactory));
     }
 }

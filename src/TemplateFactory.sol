@@ -36,8 +36,8 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     address public vault;
     uint96 public totalDeployments;
 
-    ERC404LegacyFactory private immutable LEGACY_FACTORY;
-    bytes32 private immutable LEGACY_TEMPLATE_ID;
+    bytes32 public immutable LEGACY_TEMPLATE_ID;
+    ERC404LegacyFactory public immutable LEGACY_FACTORY;
 
     mapping(bytes32 id => Template template) private _templates;
     mapping(address user => Deployment[] deployments) private _deploymentsOf;
