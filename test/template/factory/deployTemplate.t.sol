@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.24;
 
-import { Deployments } from "script/DeploymentsLib.sol";
+import { Deployments } from "script/Deployments.sol";
 import { TemplateFactory } from "src/TemplateFactory.sol";
 import { MockSimpleContractTemplate } from "test/mocks/SimpleContractTemplate.t.sol";
 import { MockProxyCloneTemplate } from "test/mocks/ProxyCloneTemplate.t.sol";

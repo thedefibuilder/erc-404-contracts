@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import { ShortStrings, ShortString } from "@oz/utils/ShortStrings.sol";
 import { console } from "forge-std/src/console.sol";
-import { Deployments } from "script/DeploymentsLib.sol";
+import { Deployments } from "script/Deployments.sol";
 import { BaseScript } from "./Base.s.sol";
 import { TemplateFactory } from "src/TemplateFactory.sol";
 import { ERC404ManagedURI } from "src/templates/ERC404ManagedURI.sol";
@@ -18,7 +18,9 @@ contract Deploy is BaseScript {
         // Polygon = 30e18 MATIC
         // BNB = 0.1e18 BNB
         // LINEA & ARBITRUM = 0.01e18 ETH
-        factory = Deployments.deployTemplateFactory(0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd, broadcaster);
+        factory = Deployments.deployTemplateFactory(
+            0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd, broadcaster, 0xF4BF3C20Fe52dA6Ff8540B913aAa00e98FbF2f53
+        );
 
         Template erc404Template = toTemplate(
             Deployments.deployCodePointer(type(ERC404ManagedURI).creationCode), TemplateType.SimpleContract, 0.01e18

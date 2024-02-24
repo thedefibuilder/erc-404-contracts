@@ -8,14 +8,18 @@ import { Create2 } from "@oz/utils/Create2.sol";
 import { Address } from "@oz/utils/Address.sol";
 import { EnumerableSet } from "@oz/utils/structs/EnumerableSet.sol";
 import { SSTORE2 } from "@solmate/utils/SSTORE2.sol";
+import { SafeCast } from "@oz/utils/math/SafeCast.sol";
 import { Template, TemplateType } from "src/types/Template.sol";
+import { ERC404LegacyFactory, ERC404LegacyManagedURI } from "src/legacy/ERC404LegacyFactory.sol";
 
 contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     using Address for *;
+    using SafeCast for uint256;
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using Clones for address;
     using SSTORE2 for address;
 
+    error ZeroAddress();
     error ImplementationNotFound();
     error TemplateNotSupported();
     error InsufficientDeploymentFee();
@@ -32,11 +36,16 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     address public vault;
     uint96 public totalDeployments;
 
+    ERC404LegacyFactory private immutable LEGACY_FACTORY;
+    bytes32 private immutable LEGACY_TEMPLATE_ID;
+
     mapping(bytes32 id => Template template) private _templates;
     mapping(address user => Deployment[] deployments) private _deploymentsOf;
     EnumerableSet.Bytes32Set private _templateIds;
 
-    constructor() {
+    constructor(address legacyFactory, bytes32 legacyTemplateId) {
+        LEGACY_FACTORY = ERC404LegacyFactory(legacyFactory);
+        LEGACY_TEMPLATE_ID = legacyTemplateId;
         _disableInitializers();
     }
 
@@ -69,10 +78,9 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
     /// @param initData The data to be used in the initializer/constructor of deployed contract.
     /// @dev For proxy clones, initData should include selector.
     function deployTemplate(bytes32 templateId, bytes calldata initData) external payable returns (address instance) {
-        Template template = _templates[templateId];
-        (address implementation, TemplateType templateType, uint88 deploymentFee) = template.unwrap();
+        (address implementation, TemplateType templateType, uint88 deploymentFee) = getTemplate(templateId);
 
-        // Check
+        // Checks
         if (implementation.code.length == 0) revert ImplementationNotFound();
         if (msg.value < deploymentFee) revert InsufficientDeploymentFee();
 
@@ -82,6 +90,8 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
             instance = _deploySimpleContract(implementation, initData);
         } else if (templateType == TemplateType.ProxyClone) {
             instance = _deployProxyClone(implementation, initData);
+        } else if (templateType == TemplateType.LegacyFactory) {
+            instance = _deployERC404Legacy(implementation, initData, deploymentFee);
         } else {
             revert TemplateNotSupported();
         }
@@ -89,27 +99,41 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         emit TemplateDeployed(templateId, instance, msg.sender);
 
         // Interactions
-        if (deploymentFee > 0) {
+        // In legacy deployments fee is already handled by the factory.
+        if (deploymentFee > 0 && templateId != LEGACY_TEMPLATE_ID) {
             payable(vault).sendValue(deploymentFee);
         }
-        if (msg.value > deploymentFee) {
-            unchecked {
-                payable(msg.sender).sendValue(msg.value - deploymentFee);
-            }
-        }
+        _refundUser(deploymentFee);
     }
 
     /// @notice Returns the template data given a specific id.
     function getTemplate(bytes32 templateId)
-        external
+        public
         view
         returns (address implementation, TemplateType templateType, uint88 deploymentFee)
     {
+        if (templateId == LEGACY_TEMPLATE_ID) {
+            deploymentFee = uint256(LEGACY_FACTORY.deploymentFeeForUser(address(this))).toUint88();
+            return (address(LEGACY_FACTORY), TemplateType.LegacyFactory, deploymentFee);
+        }
         return _templates[templateId].unwrap();
     }
 
     /// @notice Returns all the deployments of a specific user.
     function deploymentsOf(address user) external view returns (Deployment[] memory) {
+        address[] memory legacyDeployments = LEGACY_FACTORY.deploymentsOf(user);
+        uint256 legacyDeploymentsLength = legacyDeployments.length;
+        if (legacyDeploymentsLength > 0) {
+            uint256 deploymentsLength = _deploymentsOf[user].length;
+            Deployment[] memory allDeployments = new Deployment[](legacyDeploymentsLength + deploymentsLength);
+            for (uint256 i = 0; i < legacyDeploymentsLength; i++) {
+                allDeployments[i] = Deployment(LEGACY_TEMPLATE_ID, legacyDeployments[i]);
+            }
+            for (uint256 i = 0; i < deploymentsLength; i++) {
+                allDeployments[i + legacyDeploymentsLength] = _deploymentsOf[user][i];
+            }
+            return allDeployments;
+        }
         return _deploymentsOf[user];
     }
 
@@ -144,8 +168,31 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
         }
     }
 
+    function _deployERC404Legacy(
+        address,
+        bytes calldata constructorArgs,
+        uint256 deploymentFee
+    )
+        internal
+        returns (address instance)
+    {
+        (string memory name, string memory symbol, string memory baseURI, uint256 totalNFTSupply) =
+            abi.decode(constructorArgs, (string, string, string, uint256));
+        instance = LEGACY_FACTORY.deployERC404{ value: deploymentFee }(name, symbol, baseURI, totalNFTSupply);
+        ERC404LegacyManagedURI(instance).transferOwnership(msg.sender);
+    }
+
     function _setVault(address newVault) internal {
+        if (newVault == address(0)) revert ZeroAddress();
         vault = newVault;
         emit VaultSet(newVault);
+    }
+
+    function _refundUser(uint256 neededAmount) internal {
+        if (msg.value > neededAmount) {
+            unchecked {
+                payable(msg.sender).sendValue(msg.value - neededAmount);
+            }
+        }
     }
 }

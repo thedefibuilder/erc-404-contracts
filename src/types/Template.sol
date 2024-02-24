@@ -10,7 +10,8 @@ using Templates for Template global;
 /// 2. Proxy, address stores implementation.
 enum TemplateType {
     SimpleContract,
-    ProxyClone
+    ProxyClone,
+    LegacyFactory
 }
 
 function toTemplate(address implementation, TemplateType templateType, uint88 deploymentFee) pure returns (Template) {
