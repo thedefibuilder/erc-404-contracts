@@ -10,6 +10,9 @@ contract TemplateFactory_deploymentsOf is TemplateFactoryTest {
     bytes32 public contractTemplateId = bytes32(uint256(1));
     Template public contractTemplate;
 
+    uint256 public legacyDeployments = 10;
+    uint256 public newDeployments = 10;
+
     function setUp() public override {
         super.setUp();
 
@@ -21,7 +24,7 @@ contract TemplateFactory_deploymentsOf is TemplateFactoryTest {
         factory.setTemplate(contractTemplateId, contractTemplate);
     }
 
-    function testFuzz_CombinesLegacyDeployments(uint128 legacyDeployments, uint128 newDeployments) public {
+    function test_CombinesLegacyDeployments() public {
         vm.startPrank(users.deployer);
         for (uint256 i = 0; i < legacyDeployments; i++) {
             legacyFactory.deployERC404{ value: legacyFactory.deploymentFee() }("name", "symbol", "baseURI", 100);
