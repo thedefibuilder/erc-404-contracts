@@ -34,7 +34,7 @@ abstract contract BaseScript is Script {
         // solhint-disable-next-line custom-errors
         require(config.chainId != 0, "Chain config not found");
 
-        // Print to assure the correct config is loaded.
+        // Print to assure the correct config is loaded correctly.
         console.log("ADMIN", config.admin);
         console.log("CHAIN_ID", config.chainId);
         console.log("DEPLOYMENT_FEE", config.deploymentFee);

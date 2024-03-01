@@ -4,7 +4,7 @@
     "chainId": 421614,
     "deploymentFee": 1000000000000000,
     "legacyFactory": "0xF4BF3C20Fe52dA6Ff8540B913aAa00e98FbF2f53",
-    "templateFactory": "0xAC01AcFd592e5Fc3bdE65B89fd6aa7B04E07F933",
+    "templateFactory": "0x4171dEE006de9A4114385Fa3Dd19e527F98BF3Ea",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   },
   {
@@ -12,7 +12,7 @@
     "chainId": 59140,
     "deploymentFee": 2000000000000000,
     "legacyFactory": "0x678690c9D8E4E7Ec21fa0681746002e069C4DF95",
-    "templateFactory": "0x4050c6E8CEf900c5f88Fe9C5Df0d1f889B5Ec5c9",
+    "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   },
   {
@@ -28,7 +28,7 @@
     "chainId": 97,
     "deploymentFee": 4000000000000000,
     "legacyFactory": "0x23DCB7ccceFEEd877f263c8467E3cEa87C67e4Ca",
-    "templateFactory": "0x4050c6E8CEf900c5f88Fe9C5Df0d1f889B5Ec5c9",
+    "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   }
 ]
