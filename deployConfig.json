@@ -8,10 +8,26 @@
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   },
   {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 42161,
+    "deploymentFee": 10000000000000000,
+    "legacyFactory": "0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E",
+    "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
     "admin": "0x13E58f68217c0829E6a51633d12CF2924bC72a99",
     "chainId": 59140,
     "deploymentFee": 2000000000000000,
     "legacyFactory": "0x678690c9D8E4E7Ec21fa0681746002e069C4DF95",
+    "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 59144,
+    "deploymentFee": 10000000000000000,
+    "legacyFactory": "0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E",
     "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   },
@@ -24,10 +40,26 @@
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   },
   {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 137,
+    "deploymentFee": 30000000000000000000,
+    "legacyFactory": "0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E",
+    "templateFactory": "0x4050c6E8CEf900c5f88Fe9C5Df0d1f889B5Ec5c9",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
     "admin": "0x13E58f68217c0829E6a51633d12CF2924bC72a99",
     "chainId": 97,
     "deploymentFee": 4000000000000000,
     "legacyFactory": "0x23DCB7ccceFEEd877f263c8467E3cEa87C67e4Ca",
+    "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 56,
+    "deploymentFee": 100000000000000000,
+    "legacyFactory": "0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E",
     "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   }
