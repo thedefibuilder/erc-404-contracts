@@ -62,5 +62,29 @@
     "legacyFactory": "0x6bdc4c9FC3AE70c118550Dba6acd36d86C70298E",
     "templateFactory": "0x7DEd699ea62737DD6e2B57Da27C9e6aAD9344f7d",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 84532,
+    "deploymentFee": 10000000000000000,
+    "legacyFactory": "0x0000000000000000000000000000000000000000",
+    "templateFactory": "0x0000000000000000000000000000000000000000",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 8453,
+    "deploymentFee": 10000000000000000,
+    "legacyFactory": "0x0000000000000000000000000000000000000000",
+    "templateFactory": "0x0000000000000000000000000000000000000000",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 666666666,
+    "deploymentFee": 42000000000000000000,
+    "legacyFactory": "0x0000000000000000000000000000000000000000",
+    "templateFactory": "0x0000000000000000000000000000000000000000",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   }
 ]

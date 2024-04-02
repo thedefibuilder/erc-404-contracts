@@ -29,7 +29,8 @@ polygon = { key = "${API_KEY_POLYGONSCAN}" }
 polygon_mumbai = { key = "${API_KEY_POLYGONSCAN}" }
 linea = { key = "${API_KEY_LINEASCAN}" }
 linea_goerli = { key = "${API_KEY_LINEASCAN}" }
-
+base = { key = "${API_KEY_BASESCAN}" }
+base_sepolia = { key = "${API_KEY_BASESCAN}" }
 
 [fmt]
 bracket_spacing = true
@@ -51,3 +52,6 @@ polygon = "https://polygon-mainnet.infura.io/v3/${API_KEY_INFURA}"
 polygon_mumbai = "https://polygon-mumbai.infura.io/v3/${API_KEY_INFURA}"
 linea = "https://linea-mainnet.infura.io/v3/${API_KEY_INFURA}"
 linea_goerli = "https://linea-goerli.infura.io/v3/${API_KEY_INFURA}"
+base_sepolia = "https://sepolia.base.org"
+base = "https://mainnet.base.org"
+degen = "https://rpc.degen.tips"

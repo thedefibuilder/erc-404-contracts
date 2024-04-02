@@ -121,9 +121,9 @@ contract TemplateFactory is OwnableUpgradeable, UUPSUpgradeable {
 
     /// @notice Returns all the deployments of a specific user.
     function deploymentsOf(address user) external view returns (Deployment[] memory) {
-        address[] memory legacyDeployments = LEGACY_FACTORY.deploymentsOf(user);
-        uint256 legacyDeploymentsLength = legacyDeployments.length;
-        if (legacyDeploymentsLength > 0) {
+        if (address(LEGACY_FACTORY) != address(0)) {
+            address[] memory legacyDeployments = LEGACY_FACTORY.deploymentsOf(user);
+            uint256 legacyDeploymentsLength = legacyDeployments.length;
             uint256 deploymentsLength = _deploymentsOf[user].length;
             Deployment[] memory allDeployments = new Deployment[](legacyDeploymentsLength + deploymentsLength);
             for (uint256 i = 0; i < legacyDeploymentsLength; i++) {

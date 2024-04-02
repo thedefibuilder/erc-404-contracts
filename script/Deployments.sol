@@ -18,8 +18,7 @@ library Deployments {
         returns (TemplateFactory)
     {
         bytes memory data = abi.encodeWithSelector(TemplateFactory.initialize.selector, vault, admin);
-        // solhint-disable-next-line max-line-length
-        TemplateFactory factory = new TemplateFactory(legacyFactory, ShortString.unwrap("ERC404Legacy".toShortString()));
+        TemplateFactory factory = new TemplateFactory(legacyFactory, ShortString.unwrap("NoLegacy".toShortString()));
         ERC1967Proxy proxy = new ERC1967Proxy(address(factory), data);
         return TemplateFactory(address(proxy));
     }
