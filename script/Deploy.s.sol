@@ -18,20 +18,25 @@ contract Deploy is BaseScript {
     TemplateFactory public factory;
 
     function run() public broadcast {
+        uint256 gasBefore = gasleft();
+
         factory = Deployments.deployTemplateFactory(config.vault, config.admin, config.legacyFactory);
 
         Template erc404Template = toTemplate(
-            Deployments.deployCodePointer(type(ERC404ManagedURI).creationCode), TemplateType.SimpleContract, 42e18
+            Deployments.deployCodePointer(type(ERC404ManagedURI).creationCode),
+            TemplateType.SimpleContract,
+            uint88(config.deploymentFee)
         );
         Template legacyTemplate = toTemplate(
             Deployments.deployCodePointer(type(ERC404LegacyManagedURI).creationCode),
             TemplateType.SimpleContract,
-            6.9e18
+            uint88(config.deploymentFee) / 2
         );
 
         factory.setTemplate(ShortString.unwrap("ERC404Optimized".toShortString()), erc404Template);
         factory.setTemplate(ShortString.unwrap("ERC404Legacy".toShortString()), legacyTemplate);
 
+        console.log("Deployed TemplateFactory in", gasBefore - gasleft(), "gas");
         console.log("Deployed TemplateFactory at", address(factory));
     }
 }

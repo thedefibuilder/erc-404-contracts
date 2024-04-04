@@ -86,5 +86,13 @@
     "legacyFactory": "0x0000000000000000000000000000000000000000",
     "templateFactory": "0x0000000000000000000000000000000000000000",
     "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 1890,
+    "deploymentFee": 10000000000000000,
+    "legacyFactory": "0x0000000000000000000000000000000000000000",
+    "templateFactory": "0x5Ae692aac6791Cfccb87B6d9a1c994be6Ec10327",
+    "vault": "0x5B3B2c5dfCAfeB4bf46Cfc3141e36E793f4C6fcd"
   }
 ]
