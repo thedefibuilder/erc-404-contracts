@@ -102,5 +102,13 @@
     "legacyFactory": "0x0000000000000000000000000000000000000000",
     "templateFactory": "0x5Ae692aac6791Cfccb87B6d9a1c994be6Ec10327",
     "vault": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE"
+  },
+  {
+    "admin": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE",
+    "chainId": 463,
+    "deploymentFee": 0,
+    "legacyFactory": "0x0000000000000000000000000000000000000000",
+    "templateFactory": "0xf3EdABb0d7f90De936f7ab1a034E368dd2cB5943",
+    "vault": "0x1606b74131162a6EeaD68f0294d2967cf6166DdE"
   }
 ]
