@@ -31,6 +31,7 @@ linea = { key = "${API_KEY_LINEASCAN}" }
 linea_goerli = { key = "${API_KEY_LINEASCAN}" }
 base = { key = "${API_KEY_BASESCAN}" }
 base_sepolia = { key = "${API_KEY_BASESCAN}" }
+core = { chain = 1116, url = "https://scan.coredao.org/api", key = "${API_KEY_CORESCAN}" }
 
 [fmt]
 bracket_spacing = true
@@ -58,3 +59,4 @@ degen = "https://rpc.degen.tips"
 lightlink = "https://replicator.phoenix.lightlink.io/rpc/v1	"
 blast = "https://blast.blockpi.network/v1/rpc/public"
 areon = "https://mainnet-rpc.areon.network"
+core = "https://rpc.coredao.org"
